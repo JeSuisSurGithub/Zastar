@@ -7,5 +7,5 @@ layout (location = 33) uniform sampler2D characters;
 
 void main()
 {
-    out_rgba = texture(characters, in_uv) * 2.0;
+    out_rgba = texture(characters, in_uv);
 }

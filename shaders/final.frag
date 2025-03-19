@@ -8,7 +8,7 @@ layout (location = 36) uniform sampler2D bloom;
 layout (location = 40) uniform uint screen_tearing_pos;
 
 const float GAMMA = 1.0;
-const float EXPOSURE = 0.3;
+const float EXPOSURE = 0.6;
 
 vec3 vhs_look(sampler2D image, vec2 uv, float chromatic_aberration_amount, float scan_shift, uint scan_height)
 {

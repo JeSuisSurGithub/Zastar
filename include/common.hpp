@@ -29,7 +29,7 @@ namespace zsl
     typedef signed long long int isz;
     typedef std::size_t usz;
 
-    const std::string WINDOW_NAME{"Zastarlena"};
+    const std::string WINDOW_NAME{"Zastar"};
     constexpr u32 MAX_TEXTURE_COUNT{32};
     constexpr u32 MAX_POINT_LIGHT{32};
     constexpr float ZFAR{1e+10f};

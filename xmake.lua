@@ -1,13 +1,13 @@
 set_xmakever("2.2.1")
 
-set_project("Zastarlena")
+set_project("Zastar")
 set_version("1.8.0")
 set_languages("cxx17")
 
 -- add_requires("opengl", "glfw", "glslang", {configs = {binaryonly = true}})
 
 -- Source files
-target("zastarlena")
+target("zastar")
     set_kind("binary")
     add_files(
         "src/glad.c",
