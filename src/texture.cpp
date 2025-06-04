@@ -8,9 +8,8 @@ namespace zsl
 {
 namespace texture
 {
-    texture::texture(u32 width, u32 height, u32 index, GLenum filter, GLenum wrap, GLenum format)
+    texture::texture(u32 width, u32 height, GLenum filter, GLenum wrap, GLenum format)
     :
-    m_index(index),
     m_width(width),
     m_height(height)
     {
@@ -22,10 +21,9 @@ namespace texture
         glTextureStorage2D(m_id, 1, format, m_width, m_height);
     }
 
-    texture::texture(const std::string& texture_path, u32 index, GLenum S_WRAP, GLenum T_WRAP)
+    texture::texture(const std::string& texture_path, GLenum wrap)
     :
-    m_texture_path(texture_path),
-    m_index(index)
+    m_texture_path(texture_path)
     {
         int width;
         int height;
@@ -38,8 +36,8 @@ namespace texture
         glCreateTextures(GL_TEXTURE_2D, 1, &m_id);
         glTextureParameteri(m_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTextureParameteri(m_id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTextureParameteri(m_id, GL_TEXTURE_WRAP_S, S_WRAP);
-        glTextureParameteri(m_id, GL_TEXTURE_WRAP_T, T_WRAP);
+        glTextureParameteri(m_id, GL_TEXTURE_WRAP_S, wrap);
+        glTextureParameteri(m_id, GL_TEXTURE_WRAP_T, wrap);
         glTextureParameteri(m_id, GL_TEXTURE_MAX_ANISOTROPY, 16.f);
         glTextureStorage2D(m_id, 1, GL_RGBA8, m_width, m_height);
         glTextureSubImage2D(m_id, 0, 0, 0, m_width, m_height, GL_RGBA, GL_UNSIGNED_BYTE, data);
@@ -50,11 +48,6 @@ namespace texture
     texture::~texture()
     {
         glDeleteTextures(1, &m_id);
-    }
-
-    void bind(texture& texture_)
-    {
-        glBindTextureUnit(texture_.m_index, texture_.m_id);
     }
 
     void bind(texture& texture_, u32 index)

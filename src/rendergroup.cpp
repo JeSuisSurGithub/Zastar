@@ -123,7 +123,7 @@ namespace rendergroups
         if (iterator == std::end(group.m_textures))
         {
             u32 texture_index = group.m_textures.size();
-            group.m_textures.push_back(std::make_unique<texture::texture>(texture_path, texture_index));
+            group.m_textures.push_back(std::make_unique<texture::texture>(texture_path));
             return texture_index;
         }
         return std::distance(std::begin(group.m_textures), iterator);

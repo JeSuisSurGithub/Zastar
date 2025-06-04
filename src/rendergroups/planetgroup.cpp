@@ -71,7 +71,7 @@ namespace rendergroups
         {
             if (glm::distance(camera_xyz, cur_object.base.m_translation) > ZFAR * 0.65)
                 continue;
-            bind(*context.m_base->m_textures[cur_object.base.m_texture_index]);
+            bind(*context.m_base->m_textures[cur_object.base.m_texture_index], cur_object.base.m_texture_index);
             cur_ubo.transform = get_transform_mat(cur_object.base);
             cur_ubo.inverse_transform = glm::inverse(cur_ubo.transform);
             cur_ubo.texture_index = cur_object.base.m_texture_index;

@@ -8,7 +8,7 @@ namespace rendergroups
     textgroup::textgroup(usz size)
     :
     m_size(size),
-    m_characters("textures/font.png", 0, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE),
+    m_characters("textures/font.png", GL_CLAMP_TO_EDGE),
     m_program("shaders/text.vert", "shaders/text.frag", ZSL_LOAD_SPIRV)
     {
         update_int(m_program, UNIFORM_LOCATIONS::CHARACTER_TEXTURE, 0);
@@ -60,7 +60,7 @@ namespace rendergroups
     void render(textgroup& group, glm::vec2 framebuffer_size, const std::vector<text>& texts)
     {
         bind(group.m_program);
-        bind(group.m_characters);
+        bind(group.m_characters, 0);
         update_vec2(group.m_program,
             UNIFORM_LOCATIONS::SCREEN_RESOLUTION, framebuffer_size);
         group.m_translations.clear();

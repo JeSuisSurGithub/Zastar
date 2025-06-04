@@ -10,7 +10,7 @@ namespace framebuffer
     m_final("shaders/quad.vert", "shaders/final.frag", ZSL_LOAD_SPIRV),
     m_upsampler("shaders/quad.vert", "shaders/upsampler.frag", ZSL_LOAD_SPIRV),
     m_downsampler("shaders/quad.vert", "shaders/downsampler.frag", ZSL_LOAD_SPIRV),
-    m_depthbuf(width, height, 0, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_DEPTH24_STENCIL8),
+    m_depthbuf(width, height, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_DEPTH24_STENCIL8),
     m_width(width),
     m_height(height),
     m_screen_tearing_count(previous_count)
@@ -31,7 +31,7 @@ namespace framebuffer
         for (usz index = 0; index < 2; index++)
         {
             m_colorbufs[index] =
-                std::make_unique<texture::texture>(m_width, m_height, index, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_RGBA16F);
+                std::make_unique<texture::texture>(m_width, m_height, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_RGBA16F);
             bind_to_framebuffer(*m_colorbufs[index], m_fbo, GL_COLOR_ATTACHMENT0 + index);
         }
 
@@ -53,7 +53,7 @@ namespace framebuffer
         {
             mip_size /= 2.0;
             m_bloom_colorbufs[index] =
-                std::make_unique<texture::texture>(mip_size.x, mip_size.y, index, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_RGBA16F);
+                std::make_unique<texture::texture>(mip_size.x, mip_size.y, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_RGBA16F);
         }
         glNamedFramebufferDrawBuffers(m_bloom_fbo, 1, attachments);
         bind_to_framebuffer(*m_bloom_colorbufs[0], m_bloom_fbo, GL_COLOR_ATTACHMENT0);

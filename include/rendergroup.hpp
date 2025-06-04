@@ -37,6 +37,7 @@ namespace zsl
             rendergroup &operator=(rendergroup &&) = delete;
 
             std::unique_ptr<shader::shader> m_program;
+            // Beware if writing remove texture
             std::vector<std::unique_ptr<texture::texture>> m_textures;
             std::vector<std::unique_ptr<model::model>> m_models;
 
