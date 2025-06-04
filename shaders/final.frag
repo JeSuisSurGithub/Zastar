@@ -9,8 +9,8 @@ layout (location = 40) uniform float time;
 layout (location = 41) uniform sampler2D depth;
 
 
-const float ZFAR = 1e+6;
-const float ZNEAR = 0.1;
+const float ZFAR = 4e+4;
+const float ZNEAR = 1.0;
 
 const int AF_POINT_COUNT = 9;
 const vec2 AF_POINTS[9] = vec2[](
@@ -19,15 +19,16 @@ const vec2 AF_POINTS[9] = vec2[](
     vec2(-0.1,  0.1), vec2( 0.0,  0.1), vec2( 0.1,  0.1)
 );
 
-const float AF_POINT_SCALE = 0.4;
-const float AF_ROUNDING = 0.01;
+const float AF_POINT_SCALE = 0.3;
+const float AF_ROUNDING = 0.001;
+const float AF_FALSE_INFINITY = 1.0 - 1e-1;
 
 const float BLUR_WEIGHTS[5] = float[] (0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216);
 
-const float GAMMA = 1.0;
-const float EXPOSURE = 0.6;
+const float GAMMA = 2.2;
+const float EXPOSURE = 1;
 
-const float BLOOM_MIX = 0.08;
+const float BLOOM_MIX = 0.1;
 
 const float AF_ZONE_OPACITY = 0.2;
 
@@ -74,7 +75,12 @@ float compute_focus_depth()
 
     float avg = total / float(AF_POINT_COUNT);
     float scale = 1.0 / AF_ROUNDING;
-    return round(avg * scale) / scale;
+    float focus_depth = round(avg * scale) / scale;
+    if (focus_depth > AF_FALSE_INFINITY) {
+        return focus_depth = AF_FALSE_INFINITY;
+    } else {
+        return focus_depth;
+    }
 }
 
 vec3 star_blur(sampler2D image)
@@ -91,7 +97,17 @@ vec3 star_blur(sampler2D image)
         result += texture(image, in_uv + vec2(0.0, tex_offset.y * i)).rgb * BLUR_WEIGHTS[i];
         result += texture(image, in_uv - vec2(0.0, tex_offset.y * i)).rgb * BLUR_WEIGHTS[i];
     }
-    return result;
+    for(int i = 1; i < 5; ++i)
+    {
+        result += texture(image, in_uv + vec2(tex_offset.x * i, tex_offset.y * i)).rgb * BLUR_WEIGHTS[i];
+        result += texture(image, in_uv - vec2(tex_offset.x * i, tex_offset.y * i)).rgb * BLUR_WEIGHTS[i];
+    }
+    for(int i = 1; i < 5; ++i)
+    {
+        result += texture(image, in_uv + vec2(tex_offset.x * i, -tex_offset.y * i)).rgb * BLUR_WEIGHTS[i];
+        result += texture(image, in_uv - vec2(tex_offset.x * i, -tex_offset.y * i)).rgb * BLUR_WEIGHTS[i];
+    }
+    return result / 4.0;
 }
 
 vec3 tone_map(vec3 in_rgb)
@@ -105,14 +121,7 @@ void main()
 {
     float focus_depth = compute_focus_depth();
     float frag_depth = linear_depth(texture(depth, in_uv).r);
-    float depth_diff = abs(frag_depth - focus_depth);
-
-    // if (depth_diff < 0.1) {
-    //     depth_diff = 0.0;
-    // } else if (depth_diff > 0.7) {
-    //     depth_diff = 1.0;
-    // }
-    depth_diff = smoothstep(0.08, 0.12, depth_diff);
+    float depth_diff = clamp(sqrt(sqrt(abs(frag_depth - focus_depth))), 0.0, 1.0);
 
     vec3 base_color = mix(texture(plain, in_uv).rgb, texture(bloom, in_uv).rgb, BLOOM_MIX);
     vec3 blur_color = mix(star_blur(plain), star_blur(bloom), BLOOM_MIX);
@@ -124,4 +133,5 @@ void main()
     if ((abs(vec2(in_uv) - vec2(0.5)).x < AF_POINT_SCALE * 0.1) && (abs(vec2(in_uv) - vec2(0.5)).y < AF_POINT_SCALE * 0.1)) {
         out_rgba = vec4(mix(tone_mapped, vec3(1.0), AF_ZONE_OPACITY), texture(plain, in_uv).a);
     }
+    // out_rgba = vec4(mix(tone_mapped, vec3(depth_diff), 0.5), 1.0);
 }

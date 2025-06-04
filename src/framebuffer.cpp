@@ -31,7 +31,7 @@ namespace framebuffer
         for (usz index = 0; index < 2; index++)
         {
             m_colorbufs[index] =
-                std::make_unique<texture::texture>(m_width, m_height, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_RGBA16F);
+                std::make_unique<texture::texture>(m_width, m_height, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_RGBA16F);
             bind_to_framebuffer(*m_colorbufs[index], m_fbo, GL_COLOR_ATTACHMENT0 + index);
         }
 

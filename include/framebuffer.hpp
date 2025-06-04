@@ -21,7 +21,7 @@ namespace zsl
              1.0,  1.0,  1.0, 1.0
         };
 
-        constexpr float CLEAR_COLOR[4] = {1.0/128, 0.0, 1.0/64, 1.0};
+        constexpr float CLEAR_COLOR[4] = {0.0, 0.0, 0.0, 1.0};
         constexpr float CLEAR_DEPTH = 1.f;
         constexpr i32 CLEAR_STENCIL = 1;
         constexpr usz BLOOM_LEVEL = 2;

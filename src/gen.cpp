@@ -1,6 +1,7 @@
 #include <gen.hpp>
 
 #include <algorithm>
+#include <glm/ext/scalar_constants.hpp>
 
 #define SQUARE(X) X * X
 
@@ -32,58 +33,58 @@ namespace zsl
         u32 seed,
         usz count)
     {
-        const glm::vec3 RGB_BIAS = {10.0, 6.0, 8.0};
+        const glm::vec3 RGB_BIAS = {3.0, 1.0, 2.0};
         usz planet_count = 0;
         std::cout << "Generating " << count << " solar systems..." << std::endl;
         for (usz star_count = 0; star_count < count; star_count++)
         {
             std::cout << "Generating star (" << (star_count + 1) << '/' << count << ")..." << std::endl;
-            float star_scale = lehmer_randrange_flt(seed, 20.0, 2000.0);
+            float star_scale = lehmer_randrange_flt(seed, 2.0, 200.0);
             glm::vec3 star_position = {
-                lehmer_randrange_flt(seed, -(star_scale * SQUARE(count) * 0.10), (star_scale * SQUARE(count) * 0.10)),
-                lehmer_randrange_flt(seed, -(star_scale * SQUARE(count) * 0.10), (star_scale * SQUARE(count) * 0.10)),
-                lehmer_randrange_flt(seed, -(star_scale * SQUARE(count) * 0.10), (star_scale * SQUARE(count) * 0.10))};
+                lehmer_randrange_flt(seed, -(star_scale * SQUARE(count) * 0.1), (star_scale * SQUARE(count) * 0.1)),
+                lehmer_randrange_flt(seed, -(star_scale * SQUARE(count) * 0.1), (star_scale * SQUARE(count) * 0.1)),
+                lehmer_randrange_flt(seed, -(star_scale * SQUARE(count) * 0.1), (star_scale * SQUARE(count) * 0.1))};
             glm::vec3 star_color = {
-                lehmer_randrange_flt(seed, RGB_BIAS.r,  RGB_BIAS.r * 4.0 * (star_scale * 0.1)),
-                lehmer_randrange_flt(seed, RGB_BIAS.g,  RGB_BIAS.g * 4.0 * (star_scale * 0.1)),
-                lehmer_randrange_flt(seed, RGB_BIAS.b,  RGB_BIAS.b * 4.0 * (star_scale * 0.1))};
-            usz star_planet_count = std::clamp<usz>(star_scale * (8.0/1000.0), 2.0, 6.0);
+                lehmer_randrange_flt(seed, RGB_BIAS.r,  RGB_BIAS.r * 4.0 * star_scale),
+                lehmer_randrange_flt(seed, RGB_BIAS.g,  RGB_BIAS.g * 4.0 * star_scale),
+                lehmer_randrange_flt(seed, RGB_BIAS.b,  RGB_BIAS.b * 4.0 * star_scale)};
+            usz star_planet_count = std::clamp<usz>(star_scale * (8.0/64.0), 2.0, 8.0);
             stars.m_stars.push_back(rendergroups::star(
                 *stars.m_base,
                 "models/uvs1.obj",
                 "textures/star_noise.jpg",
                 star_position,
-                glm::vec3(0.0),
+                lehmer_randrange_vec3(seed, glm::vec3(0.0), glm::vec3(glm::pi<float>())),
                 glm::vec3(star_scale),
                 star_color,
-                rendergroups::light_range_constants(8.0 * star_scale),
+                rendergroups::light_range_constants(4.0 * star_scale),
                 star_planet_count));
+
             std::cout << "Generated star (" << (star_count + 1) << '/' << count << ")" << std::endl;
             std::cout << "Generating " << star_planet_count << " planets..." << std::endl;
             for (usz index = 0; index < star_planet_count; index++, planet_count++)
             {
                 std::cout << "\tGenerating planet (" << (index + 1) << '/' << star_planet_count << ")..." << std::endl;
-                float planet_scale = lehmer_randrange_flt(seed, star_scale / 40.0, star_scale / 4.0);
+                float planet_scale = lehmer_randrange_flt(seed, star_scale / 32.0, star_scale / 8.0);
                 float planet_distance_to_star = lehmer_randrange_flt(seed,
-                    ((planet_scale / star_scale) * 80.0 + (planet_scale * 40.0)),
-                    ((planet_scale / star_scale) * 700.0 + (planet_scale * 40.0)));
+                    ((planet_scale / star_scale) * 64.0 + (planet_scale * 64.0)),
+                    ((planet_scale / star_scale) * 128.0 + (planet_scale * 128.0)));
                 float planet_revolution_speed = lehmer_randrange_flt(seed,
-                    -0.0018,
-                    0.0018);
+                    -1.f/1024,
+                    1.f/1024);
                 float planet_orbital_speed = lehmer_randrange_flt(seed,
-                    0.0001,
-                    0.0005);
+                    1.f/8192,
+                    1.f/2048);
                 float cur_angle = lehmer_randrange_flt(seed, 0.0, glm::pi<float>());
                 glm::vec3 planet_position = {
                     star_position.x + glm::cos(cur_angle) * planet_distance_to_star,
                     star_position.y,
                     star_position.z + glm::sin(cur_angle) * planet_distance_to_star};
-                glm::vec3 planet_color = lehmer_randrange_vec3(seed, glm::vec3(0.1), glm::vec3(1.0));
                 rendergroups::material material_ = {
-                    .material_ambient  = planet_color * lehmer_randrange_flt(seed, 0.3, 1.0),
-                    .material_diffuse  = planet_color * lehmer_randrange_flt(seed, 0.3, 1.0),
-                    .material_specular = planet_color * lehmer_randrange_flt(seed, 0.3, 1.0),
-                    .shininess = lehmer_randrange_flt(seed, 0.3, 1.0)};
+                    .material_ambient  = lehmer_randrange_vec3(seed, glm::vec3(0.1), glm::vec3(0.2)),
+                    .material_diffuse  = glm::vec3(lehmer_randrange_flt(seed, 0.1, 0.5)),
+                    .material_specular = glm::vec3(lehmer_randrange_flt(seed, 1.0, 4.0)),
+                    .shininess = lehmer_randrange_flt(seed, 4.0, 8.0)};
                 planets.m_planets.push_back(rendergroups::planet(
                     *planets.m_base,
                     "models/uvs1.obj",

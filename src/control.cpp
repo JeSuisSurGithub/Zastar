@@ -10,7 +10,7 @@ namespace controls
 {
     controls::controls(window::window& window_)
     :
-    m_move_speed(5.0),
+    m_move_speed(0.1),
     m_view_speed(.0001),
     m_horizontal_angle(3.14),
     m_vertical_angle(0.0),
@@ -66,13 +66,13 @@ namespace controls
         glm::vec3 up = glm::cross(right, forward);
         if (is_pressed(window_, KEYMAP::INCREASE_SPEED))
         {
-            context.m_move_speed += 1.0;
+            context.m_move_speed += 0.05;
         }
         if (is_pressed(window_, KEYMAP::DECREASE_SPEED))
         {
-            context.m_move_speed -= 1.0;
+            context.m_move_speed -= 0.05;
         }
-        context.m_move_speed = std::clamp<float>(context.m_move_speed, 1.0, 100.0);
+        context.m_move_speed = std::clamp<float>(context.m_move_speed, 0.05, 2.0);
         if (is_pressed(window_, KEYMAP::FORWARD))
         {
             context.m_camera_xyz += forward * delta_time * context.m_move_speed;

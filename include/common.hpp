@@ -32,8 +32,8 @@ namespace zsl
     const std::string WINDOW_NAME{"Zastar"};
     constexpr u32 MAX_TEXTURE_COUNT{32};
     constexpr u32 MAX_POINT_LIGHT{32};
-    constexpr float ZFAR{1e+6};
-    constexpr float ZNEAR{0.1f};
+    constexpr float ZFAR{4e+4};
+    constexpr float ZNEAR{1.f};
 
     typedef enum
     {

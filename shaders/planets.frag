@@ -65,7 +65,7 @@ void main()
     vec3 normal = normalize(in_world_normal);
     vec3 view_direction = normalize(camera_xyz - in_world_xyz);
 
-    vec3 lighting = vec3(0.5);
+    vec3 lighting = vec3(0.0);
 
     for (uint i = 0; i < current_point_light_count; i++)
         lighting +=
