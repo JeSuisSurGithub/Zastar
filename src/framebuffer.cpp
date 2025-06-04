@@ -13,7 +13,7 @@ namespace framebuffer
     m_depthbuf(width, height, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_DEPTH24_STENCIL8),
     m_width(width),
     m_height(height),
-    m_screen_tearing_count(previous_count)
+    m_time(previous_count)
     {
         glCreateBuffers(1, &m_vbo);
         glNamedBufferStorage(m_vbo, sizeof(SCREEN_VERTICES), &SCREEN_VERTICES, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
@@ -35,9 +35,6 @@ namespace framebuffer
             bind_to_framebuffer(*m_colorbufs[index], m_fbo, GL_COLOR_ATTACHMENT0 + index);
         }
 
-        // glCreateRenderbuffers(1, &m_rbo);
-        // glNamedRenderbufferStorage(m_rbo, GL_DEPTH24_STENCIL8, m_width, m_height);
-        // glNamedFramebufferRenderbuffer(m_fbo, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_rbo);
         bind_to_framebuffer(m_depthbuf, m_fbo, GL_DEPTH_STENCIL_ATTACHMENT);
 
         GLuint attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
@@ -64,6 +61,7 @@ namespace framebuffer
         update_int(m_downsampler, UNIFORM_LOCATIONS::DOWNSAMPLE_TEXTURE, 0);
         update_int(m_final, UNIFORM_LOCATIONS::COMBINE_MAIN_SCENE, 0);
         update_int(m_final, UNIFORM_LOCATIONS::COMBINE_BLOOM, 1);
+        update_int(m_final, UNIFORM_LOCATIONS::DEPTH_STENCIL_TEXTURE, 2);
     }
 
     framebuffer::~framebuffer()
@@ -71,7 +69,6 @@ namespace framebuffer
         glDeleteVertexArrays(1, &m_vao);
         glDeleteBuffers(1, &m_vbo);
         glDeleteFramebuffers(1, &m_fbo);
-        // glDeleteRenderbuffers(1, &m_rbo);
         glDeleteFramebuffers(1, &m_bloom_fbo);
     }
 
@@ -89,7 +86,7 @@ namespace framebuffer
 
     void end_render(framebuffer& fb_, float delta_time)
     {
-        fb_.m_screen_tearing_count += delta_time / 4.0;
+        fb_.m_time += delta_time;
         glBindFramebuffer(GL_FRAMEBUFFER, fb_.m_bloom_fbo);
         {
             bind(fb_.m_downsampler);
@@ -124,9 +121,10 @@ namespace framebuffer
         bind(fb_.m_final);
         update_vec2(fb_.m_final,
             UNIFORM_LOCATIONS::SCREEN_RESOLUTION, {fb_.m_width, fb_.m_height});
-        update_uint(fb_.m_final, UNIFORM_LOCATIONS::SCREEN_TEARING_SCAN_POS, fb_.m_screen_tearing_count);
+        update_float(fb_.m_final, UNIFORM_LOCATIONS::TIME, fb_.m_time);
         texture::bind(*fb_.m_colorbufs[0], 0);
         texture::bind(*fb_.m_bloom_colorbufs[0], 1);
+        texture::bind(fb_.m_depthbuf, 2);
         draw_quad(fb_);
     }
 

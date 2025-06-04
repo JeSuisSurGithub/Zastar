@@ -32,7 +32,7 @@ namespace zsl
     const std::string WINDOW_NAME{"Zastar"};
     constexpr u32 MAX_TEXTURE_COUNT{32};
     constexpr u32 MAX_POINT_LIGHT{32};
-    constexpr float ZFAR{1e+10f};
+    constexpr float ZFAR{1e+6};
     constexpr float ZNEAR{0.1f};
 
     typedef enum
@@ -57,7 +57,8 @@ namespace zsl
         UPSAMPLE_TEXTURE = 37,
         SCREEN_RESOLUTION = 38,
         DOWNSAMPLE_TEXTURE = 39,
-        SCREEN_TEARING_SCAN_POS = 40,
+        TIME = 40,
+        DEPTH_STENCIL_TEXTURE = 41,
     }UNIFORM_LOCATIONS;
 
     typedef struct vertex

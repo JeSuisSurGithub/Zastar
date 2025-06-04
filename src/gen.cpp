@@ -44,9 +44,9 @@ namespace zsl
                 lehmer_randrange_flt(seed, -(star_scale * SQUARE(count) * 0.10), (star_scale * SQUARE(count) * 0.10)),
                 lehmer_randrange_flt(seed, -(star_scale * SQUARE(count) * 0.10), (star_scale * SQUARE(count) * 0.10))};
             glm::vec3 star_color = {
-                lehmer_randrange_flt(seed, RGB_BIAS.r,  RGB_BIAS.r * 5.0 * (star_scale * 0.1)),
-                lehmer_randrange_flt(seed, RGB_BIAS.g,  RGB_BIAS.g * 5.0 * (star_scale * 0.1)),
-                lehmer_randrange_flt(seed, RGB_BIAS.b,  RGB_BIAS.b * 5.0 * (star_scale * 0.1))};
+                lehmer_randrange_flt(seed, RGB_BIAS.r,  RGB_BIAS.r * 4.0 * (star_scale * 0.1)),
+                lehmer_randrange_flt(seed, RGB_BIAS.g,  RGB_BIAS.g * 4.0 * (star_scale * 0.1)),
+                lehmer_randrange_flt(seed, RGB_BIAS.b,  RGB_BIAS.b * 4.0 * (star_scale * 0.1))};
             usz star_planet_count = std::clamp<usz>(star_scale * (8.0/1000.0), 2.0, 6.0);
             stars.m_stars.push_back(rendergroups::star(
                 *stars.m_base,
@@ -80,10 +80,10 @@ namespace zsl
                     star_position.z + glm::sin(cur_angle) * planet_distance_to_star};
                 glm::vec3 planet_color = lehmer_randrange_vec3(seed, glm::vec3(0.1), glm::vec3(1.0));
                 rendergroups::material material_ = {
-                    .material_ambient  = planet_color * lehmer_randrange_flt(seed, 0.5, 1.5),
-                    .material_diffuse  = planet_color * lehmer_randrange_flt(seed, 0.5, 1.5),
-                    .material_specular = planet_color * lehmer_randrange_flt(seed, 0.5, 1.5),
-                    .shininess = lehmer_randrange_flt(seed, 1.0, 8.0)};
+                    .material_ambient  = planet_color * lehmer_randrange_flt(seed, 0.3, 1.0),
+                    .material_diffuse  = planet_color * lehmer_randrange_flt(seed, 0.3, 1.0),
+                    .material_specular = planet_color * lehmer_randrange_flt(seed, 0.3, 1.0),
+                    .shininess = lehmer_randrange_flt(seed, 0.3, 1.0)};
                 planets.m_planets.push_back(rendergroups::planet(
                     *planets.m_base,
                     "models/uvs1.obj",

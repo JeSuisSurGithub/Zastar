@@ -72,7 +72,7 @@ namespace controls
         {
             context.m_move_speed -= 1.0;
         }
-        context.m_move_speed = std::clamp<float>(context.m_move_speed, 5.0, 100.0);
+        context.m_move_speed = std::clamp<float>(context.m_move_speed, 1.0, 100.0);
         if (is_pressed(window_, KEYMAP::FORWARD))
         {
             context.m_camera_xyz += forward * delta_time * context.m_move_speed;

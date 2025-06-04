@@ -88,6 +88,7 @@ namespace zsl
 
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);
+        glDepthMask(GL_TRUE);
 
         glEnable(GL_STENCIL_TEST);
         glStencilMask(0xFF);
@@ -143,7 +144,7 @@ namespace zsl
             if (dimensions.x != ctx_.m_framebuffer->m_width || dimensions.y != ctx_.m_framebuffer->m_height)
             {
                 glViewport(0, 0, dimensions.x, dimensions.y);
-                u32 previous_count = ctx_.m_framebuffer->m_screen_tearing_count;
+                u32 previous_count = ctx_.m_framebuffer->m_time;
                 ctx_.m_framebuffer = std::make_unique<framebuffer::framebuffer>(dimensions.x, dimensions.y, previous_count);
             }
 

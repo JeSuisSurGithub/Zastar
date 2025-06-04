@@ -21,9 +21,9 @@ namespace zsl
              1.0,  1.0,  1.0, 1.0
         };
 
-        constexpr GLfloat CLEAR_COLOR[4] = {0.005, 0.0, 0.01, 1.0};
-        constexpr GLfloat CLEAR_DEPTH = 1.0;
-        constexpr GLint CLEAR_STENCIL = 1;
+        constexpr float CLEAR_COLOR[4] = {1.0/128, 0.0, 1.0/64, 1.0};
+        constexpr float CLEAR_DEPTH = 1.f;
+        constexpr i32 CLEAR_STENCIL = 1;
         constexpr usz BLOOM_LEVEL = 2;
 
         typedef struct framebuffer
@@ -42,7 +42,6 @@ namespace zsl
 
             std::array<std::unique_ptr<texture::texture>, 2> m_colorbufs;
             GLuint m_fbo;
-            // GLuint m_rbo;
 
             texture::texture m_depthbuf;
 
@@ -52,7 +51,7 @@ namespace zsl
             i32 m_width;
             i32 m_height;
 
-            u32 m_screen_tearing_count;
+            float m_time;
 
             framebuffer(i32 width, i32 height, u32 previous_count = 0);
             ~framebuffer();
