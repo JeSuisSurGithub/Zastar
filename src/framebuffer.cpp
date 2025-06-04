@@ -1,3 +1,4 @@
+#include "texture.hpp"
 #include <framebuffer.hpp>
 
 namespace zsl
@@ -9,6 +10,7 @@ namespace framebuffer
     m_final("shaders/quad.vert", "shaders/final.frag", ZSL_LOAD_SPIRV),
     m_upsampler("shaders/quad.vert", "shaders/upsampler.frag", ZSL_LOAD_SPIRV),
     m_downsampler("shaders/quad.vert", "shaders/downsampler.frag", ZSL_LOAD_SPIRV),
+    m_depthbuf(width, height, 0, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_DEPTH24_STENCIL8),
     m_width(width),
     m_height(height),
     m_screen_tearing_count(previous_count)
@@ -29,13 +31,14 @@ namespace framebuffer
         for (usz index = 0; index < 2; index++)
         {
             m_colorbufs[index] =
-                std::make_unique<texture::texture>(m_width, m_height, index, GL_REPEAT, GL_CLAMP_TO_EDGE);
-            bind_to_framebuffer(*m_colorbufs[index], m_fbo, index);
+                std::make_unique<texture::texture>(m_width, m_height, index, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_RGBA16F);
+            bind_to_framebuffer(*m_colorbufs[index], m_fbo, GL_COLOR_ATTACHMENT0 + index);
         }
 
-        glCreateRenderbuffers(1, &m_rbo);
-        glNamedRenderbufferStorage(m_rbo, GL_DEPTH24_STENCIL8, m_width, m_height);
-        glNamedFramebufferRenderbuffer(m_fbo, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_rbo);
+        // glCreateRenderbuffers(1, &m_rbo);
+        // glNamedRenderbufferStorage(m_rbo, GL_DEPTH24_STENCIL8, m_width, m_height);
+        // glNamedFramebufferRenderbuffer(m_fbo, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_rbo);
+        bind_to_framebuffer(m_depthbuf, m_fbo, GL_DEPTH_STENCIL_ATTACHMENT);
 
         GLuint attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
         glNamedFramebufferDrawBuffers(m_fbo, 2, attachments);
@@ -50,10 +53,10 @@ namespace framebuffer
         {
             mip_size /= 2.0;
             m_bloom_colorbufs[index] =
-                std::make_unique<texture::texture>(mip_size.x, mip_size.y, index, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+                std::make_unique<texture::texture>(mip_size.x, mip_size.y, index, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_RGBA16F);
         }
         glNamedFramebufferDrawBuffers(m_bloom_fbo, 1, attachments);
-        bind_to_framebuffer(*m_bloom_colorbufs[0], m_bloom_fbo, 0);
+        bind_to_framebuffer(*m_bloom_colorbufs[0], m_bloom_fbo, GL_COLOR_ATTACHMENT0);
         if (glCheckNamedFramebufferStatus(m_bloom_fbo, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             throw std::runtime_error("Framebuffer incomplete\n");
 
@@ -68,7 +71,7 @@ namespace framebuffer
         glDeleteVertexArrays(1, &m_vao);
         glDeleteBuffers(1, &m_vbo);
         glDeleteFramebuffers(1, &m_fbo);
-        glDeleteRenderbuffers(1, &m_rbo);
+        // glDeleteRenderbuffers(1, &m_rbo);
         glDeleteFramebuffers(1, &m_bloom_fbo);
     }
 
@@ -96,7 +99,7 @@ namespace framebuffer
             for (usz index = 0; index < BLOOM_LEVEL; index++)
             {
                 glViewport(0, 0, fb_.m_bloom_colorbufs[index]->m_width, fb_.m_bloom_colorbufs[index]->m_height);
-                bind_to_framebuffer(*fb_.m_bloom_colorbufs[index], fb_.m_bloom_fbo, 0);
+                bind_to_framebuffer(*fb_.m_bloom_colorbufs[index], fb_.m_bloom_fbo, GL_COLOR_ATTACHMENT0);
                 draw_quad(fb_);
                 update_vec2(fb_.m_downsampler,
                     UNIFORM_LOCATIONS::SCREEN_RESOLUTION, {fb_.m_bloom_colorbufs[index]->m_width, fb_.m_bloom_colorbufs[index]->m_height});
@@ -110,7 +113,7 @@ namespace framebuffer
             {
                 texture::bind(*fb_.m_bloom_colorbufs[index], 0);
                 glViewport(0, 0, fb_.m_bloom_colorbufs[index - 1]->m_width, fb_.m_bloom_colorbufs[index - 1]->m_height);
-                bind_to_framebuffer(*fb_.m_bloom_colorbufs[index - 1], fb_.m_bloom_fbo, 0);
+                bind_to_framebuffer(*fb_.m_bloom_colorbufs[index - 1], fb_.m_bloom_fbo, GL_COLOR_ATTACHMENT0);
                 draw_quad(fb_);
             }
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

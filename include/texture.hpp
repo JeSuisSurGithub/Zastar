@@ -20,8 +20,7 @@ namespace zsl
             i32 m_width;
             i32 m_height;
 
-            texture(u32 width, u32 height, u32 index,
-                GLenum S_WRAP = GL_CLAMP_TO_EDGE, GLenum T_WRAP = GL_CLAMP_TO_EDGE);
+            texture(u32 width, u32 height, u32 index, GLenum filter, GLenum wrap, GLenum format);
             texture(const std::string& texture_path, u32 index,
                 GLenum S_WRAP = GL_REPEAT, GLenum T_WRAP = GL_REPEAT);
             ~texture();
@@ -29,7 +28,7 @@ namespace zsl
 
         void bind(texture& texture_);
         void bind(texture& texture_, u32 index);
-        void bind_to_framebuffer(texture& texture_, GLuint framebuffer, u32 index);
+        void bind_to_framebuffer(texture& texture_, GLuint framebuffer, GLuint attachment);
     }
 }
 

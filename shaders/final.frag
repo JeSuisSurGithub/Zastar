@@ -39,10 +39,10 @@ vec3 vhs_look(sampler2D image, vec2 uv, float chromatic_aberration_amount, float
 
 void main()
 {
-    //vec3 hdr_color = vec3(texture(main_image, in_uv));
-    //vec3 bloom_color = vec3(texture(bloom, in_uv));
-    vec3 hdr_color = vhs_look(main_image, in_uv, 1.8, 0.008, 8);
-    vec3 bloom_color = vhs_look(bloom, in_uv, 0, 0.008, 8);
+    // vec3 hdr_color = vec3(texture(main_image, in_uv));
+    // vec3 bloom_color = vec3(texture(bloom, in_uv));
+    vec3 hdr_color = vhs_look(main_image, in_uv, 0.8, 0.008, 8);
+    vec3 bloom_color = vhs_look(bloom, in_uv, 0.2, 0.008, 8);
     hdr_color = mix(hdr_color, bloom_color, 0.08);
 
     vec3 tone_mapped = vec3(1.0) - exp(-hdr_color * EXPOSURE);

@@ -137,7 +137,7 @@ namespace zsl
 
             window::window_size dimensions = get_size(ctx_.m_window);
             cur_ubo.projection =
-                glm::perspective<float>(glm::radians(controls::get_fov()), (float)dimensions.x / (float)dimensions.y, 0.1, ZFAR);
+                glm::perspective<float>(glm::radians(controls::get_fov()), (float)dimensions.x / (float)dimensions.y, ZNEAR, ZFAR);
             cur_ubo.camera_xyz = ctx_.m_controls.m_camera_xyz;
 
             if (dimensions.x != ctx_.m_framebuffer->m_width || dimensions.y != ctx_.m_framebuffer->m_height)

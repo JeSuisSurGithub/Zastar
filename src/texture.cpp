@@ -1,3 +1,4 @@
+#include "common.hpp"
 #include <texture.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -7,18 +8,18 @@ namespace zsl
 {
 namespace texture
 {
-    texture::texture(u32 width, u32 height, u32 index, GLenum S_WRAP, GLenum T_WRAP)
+    texture::texture(u32 width, u32 height, u32 index, GLenum filter, GLenum wrap, GLenum format)
     :
     m_index(index),
     m_width(width),
     m_height(height)
     {
         glCreateTextures(GL_TEXTURE_2D, 1, &m_id);
-        glTextureParameteri(m_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTextureParameteri(m_id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTextureParameteri(m_id, GL_TEXTURE_WRAP_S, S_WRAP);
-        glTextureParameteri(m_id, GL_TEXTURE_WRAP_T, T_WRAP);
-        glTextureStorage2D(m_id, 1, GL_RGBA16F, m_width, m_height);
+        glTextureParameteri(m_id, GL_TEXTURE_MIN_FILTER, filter);
+        glTextureParameteri(m_id, GL_TEXTURE_MAG_FILTER, filter);
+        glTextureParameteri(m_id, GL_TEXTURE_WRAP_S, wrap);
+        glTextureParameteri(m_id, GL_TEXTURE_WRAP_T, wrap);
+        glTextureStorage2D(m_id, 1, format, m_width, m_height);
     }
 
     texture::texture(const std::string& texture_path, u32 index, GLenum S_WRAP, GLenum T_WRAP)
@@ -39,7 +40,7 @@ namespace texture
         glTextureParameteri(m_id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTextureParameteri(m_id, GL_TEXTURE_WRAP_S, S_WRAP);
         glTextureParameteri(m_id, GL_TEXTURE_WRAP_T, T_WRAP);
-        glTextureParameteri(m_id, GL_TEXTURE_MAX_ANISOTROPY, 2.0f);
+        glTextureParameteri(m_id, GL_TEXTURE_MAX_ANISOTROPY, 16.f);
         glTextureStorage2D(m_id, 1, GL_RGBA8, m_width, m_height);
         glTextureSubImage2D(m_id, 0, 0, 0, m_width, m_height, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateTextureMipmap(m_id);
@@ -61,9 +62,9 @@ namespace texture
         glBindTextureUnit(index, texture_.m_id);
     }
 
-    void bind_to_framebuffer(texture& texture_, GLuint framebuffer, u32 index)
+    void bind_to_framebuffer(texture& texture_, GLuint framebuffer, GLuint attachment)
     {
-        glNamedFramebufferTexture(framebuffer, GL_COLOR_ATTACHMENT0 + index, texture_.m_id, 0);
+        glNamedFramebufferTexture(framebuffer, attachment, texture_.m_id, 0);
     }
 }
 }

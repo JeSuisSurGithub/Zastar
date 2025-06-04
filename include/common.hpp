@@ -33,6 +33,7 @@ namespace zsl
     constexpr u32 MAX_TEXTURE_COUNT{32};
     constexpr u32 MAX_POINT_LIGHT{32};
     constexpr float ZFAR{1e+10f};
+    constexpr float ZNEAR{0.1f};
 
     typedef enum
     {

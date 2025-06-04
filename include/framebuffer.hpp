@@ -42,7 +42,9 @@ namespace zsl
 
             std::array<std::unique_ptr<texture::texture>, 2> m_colorbufs;
             GLuint m_fbo;
-            GLuint m_rbo;
+            // GLuint m_rbo;
+
+            texture::texture m_depthbuf;
 
             std::array<std::unique_ptr<texture::texture>, BLOOM_LEVEL> m_bloom_colorbufs;
             GLuint m_bloom_fbo;
