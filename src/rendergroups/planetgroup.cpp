@@ -14,21 +14,21 @@ namespace rendergroups
         glm::vec3 rotation,
         glm::vec3 scale,
         material material__,
-        float planet_distance_to_star_,
-        float planet_revolution_speed_,
-        float planet_orbital_speed_,
+        float distance_to_star_,
+        float rev_speed_,
+        float orbit_speed_,
         float cur_angle_)
     :
-    base(create_object(group, model_path, texture_path, height_map_path))
+    base(create_object(group, model_path, texture_path, height_map_path)),
+    material_(material__),
+    distance_to_star(distance_to_star_),
+    rev_speed(rev_speed_),
+    orbit_speed(orbit_speed_),
+    cur_angle(cur_angle_)
     {
         base.m_translation = position;
         base.m_euler_angles = rotation;
         base.m_scale = scale;
-        material_ = material__;
-        planet_distance_to_star = planet_distance_to_star_;
-        planet_revolution_speed = planet_revolution_speed_;
-        planet_orbital_speed = planet_orbital_speed_;
-        cur_angle = cur_angle_;
     }
 
     planet::~planet() {}
@@ -52,13 +52,15 @@ namespace rendergroups
             {
                 planet& shorthand = context.m_planets[planet_count];
 
-                context.m_planets[planet_count].cur_angle += delta_time * shorthand.planet_orbital_speed;
+                context.m_planets[planet_count].cur_angle += delta_time * shorthand.orbit_speed;
+
                 rotate(context.m_planets[planet_count].base,
-                    glm::vec3(0.0, delta_time * shorthand.planet_revolution_speed, 0.0));
+                    glm::vec3(0.0, delta_time * shorthand.rev_speed, 0.0));
+
                 shorthand.base.m_translation = {
-                    position.x + glm::cos(shorthand.cur_angle) * shorthand.planet_distance_to_star,
+                    position.x + glm::cos(shorthand.cur_angle) * shorthand.distance_to_star,
                     position.y,
-                    position.z + glm::sin(shorthand.cur_angle) * shorthand.planet_distance_to_star};
+                    position.z + glm::sin(shorthand.cur_angle) * shorthand.distance_to_star};
             }
         }
     }
@@ -69,12 +71,16 @@ namespace rendergroups
         ubo_planet cur_ubo;
         for (const planet& cur_object : context.m_planets)
         {
-            if (glm::distance(camera_xyz, cur_object.base.m_translation) > ZFAR * 0.65)
+            if (glm::distance(camera_xyz, cur_object.base.m_translation) > ZFAR) {
                 continue;
-            bind(*context.m_base->m_textures[cur_object.base.m_texture_index], cur_object.base.m_texture_index);
+            }
+
+            int texture_index = cur_object.base.m_texture_index;
+
+            bind(*context.m_base->m_textures[texture_index], texture_index);
             cur_ubo.transform = get_transform_mat(cur_object.base);
             cur_ubo.inverse_transform = glm::inverse(cur_ubo.transform);
-            cur_ubo.texture_index = cur_object.base.m_texture_index;
+            cur_ubo.texture_index = texture_index;
             cur_ubo.material_ = cur_object.material_;
             memory::update(context.m_ubo, &cur_ubo, sizeof(ubo_planet), 0);
             draw(*context.m_base->m_models[cur_object.base.m_model_index]);

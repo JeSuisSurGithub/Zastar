@@ -4,6 +4,7 @@
 #include "rendergroup.hpp"
 #include "ubo.hpp"
 #include "rendergroups/stargroup.hpp"
+
 #include <memory>
 
 namespace zsl
@@ -30,9 +31,9 @@ namespace zsl
         {
             object base;
             material material_;
-            float planet_distance_to_star;
-            float planet_revolution_speed;
-            float planet_orbital_speed;
+            float distance_to_star;
+            float rev_speed;
+            float orbit_speed;
             float cur_angle;
 
             planet(
@@ -44,9 +45,9 @@ namespace zsl
                 glm::vec3 rotation,
                 glm::vec3 scale,
                 material material__,
-                float planet_distance_to_star,
-                float planet_revolution_speed,
-                float planet_orbital_speed,
+                float distance_to_star,
+                float rev_speed,
+                float orbit_speed,
                 float cur_angle);
             ~planet();
         }planet;

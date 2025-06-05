@@ -1,10 +1,10 @@
 set_xmakever("2.2.1")
 
 set_project("Zastar")
-set_version("1.8.0")
-set_languages("cxx17")
+set_version("1.9.0")
+set_languages("cxx20")
 
--- add_requires("opengl", "glfw", "glslang", {configs = {binaryonly = true}})
+add_requires("opengl", "glfw", "glslang", {configs = {binaryonly = true}})
 
 -- Source files
 target("zastar")

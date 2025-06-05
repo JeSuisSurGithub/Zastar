@@ -3,7 +3,7 @@
 layout (location = 0) in vec2 in_uv;
 layout (location = 0) out vec4 out_rgba;
 
-layout (location = 37) uniform sampler2D in_texture;
+layout (location = 35) uniform sampler2D in_texture;
 
 const float filter_radius = 1.0;
 

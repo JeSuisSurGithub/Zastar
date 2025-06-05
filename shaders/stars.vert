@@ -11,15 +11,13 @@ layout (location = 3) out vec2 out_uv;
 #define MAX_POINT_LIGHT 32
 #define MAX_TEXTURE_COUNT 32
 
-struct point_light
-{
+struct point_light {
     vec3 position;
     vec3 range;
     vec3 color;
 };
 
-layout (std140, binding = 0) uniform ubo_shared
-{
+layout (std140, binding = 0) uniform ubo_shared {
     mat4 view;
     mat4 projection;
     vec3 camera_xyz;
@@ -27,8 +25,7 @@ layout (std140, binding = 0) uniform ubo_shared
     uint current_point_light_count;
 };
 
-layout (std140, binding = 2) uniform ubo_star
-{
+layout (std140, binding = 2) uniform ubo_star {
     mat4 transform;
     mat4 inverse_transform;
     float texture_offset;

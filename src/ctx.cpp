@@ -1,10 +1,8 @@
-#include "rendergroups/textgroup.hpp"
-#include "control.hpp"
 #include <sstream>
 #include <ctx.hpp>
 
 #include <chrono>
-#include <thread>
+#include <iostream>
 
 namespace zsl
 {
@@ -176,6 +174,7 @@ namespace zsl
 
             texts[4] = {.text = scroll_text, .xy = scroll_text_xy};
             scroll_text_xy.x = scroll_text_xy.x - delta_time * 0.2;
+
             if (scroll_text_xy.x < -((isz)TEXT_SIZE * (isz)scroll_text.size()))
                 scroll_text_xy.x = dimensions.x;
 

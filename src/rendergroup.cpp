@@ -72,13 +72,11 @@ namespace rendergroups
         std::vector<std::unique_ptr<model::model>>::iterator iterator = std::find_if(
             group.m_models.begin(),
             group.m_models.end(),
-            [&](std::unique_ptr<model::model>& model) -> bool
-        {
+            [&](std::unique_ptr<model::model>& model) -> bool {
             return (model->m_model_path == model_path);
         });
 
-        if (iterator == std::end(group.m_models))
-        {
+        if (iterator == std::end(group.m_models)) {
             group.m_models.push_back(std::make_unique<model::model>(model_path));
             return group.m_models.size() - 1;
         }
@@ -95,12 +93,10 @@ namespace rendergroups
             group.m_models.end(),
             [&](std::unique_ptr<model::model>& model) -> bool
         {
-            return (model->m_model_path == model_path) &&
-                (model->m_height_map_path == height_map_path);
+            return (model->m_model_path == model_path) && (model->m_height_map_path == height_map_path);
         });
 
-        if (iterator == std::end(group.m_models))
-        {
+        if (iterator == std::end(group.m_models)) {
             group.m_models.push_back(std::make_unique<model::model>(model_path, height_map_path));
             return group.m_models.size() - 1;
         }
@@ -120,8 +116,7 @@ namespace rendergroups
             return (texture->m_texture_path == texture_path);
         });
 
-        if (iterator == std::end(group.m_textures))
-        {
+        if (iterator == std::end(group.m_textures)) {
             u32 texture_index = group.m_textures.size();
             group.m_textures.push_back(std::make_unique<texture::texture>(texture_path));
             return texture_index;

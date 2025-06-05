@@ -1,8 +1,6 @@
 #ifndef ZSLCOMMON_HPP
 #define ZSLCOMMON_HPP
 
-#include <cfloat>
-
 #define ZSL_LOAD_SPIRV true
 
 #include <glad/glad.h>
@@ -17,8 +15,6 @@
 #include <glm/gtx/hash.hpp>
 
 #include <cstdint>
-
-#include <iostream>
 #include <string>
 
 namespace zsl
@@ -50,15 +46,15 @@ namespace zsl
     typedef enum
     {
         TEXTURE = 0,
-        CHARACTER_TEXTURE = 33,
-        //CHARACTER_TRANSLATION = 34,
-        COMBINE_MAIN_SCENE = 35,
-        COMBINE_BLOOM = 36,
-        UPSAMPLE_TEXTURE = 37,
-        SCREEN_RESOLUTION = 38,
-        DOWNSAMPLE_TEXTURE = 39,
-        TIME = 40,
-        DEPTH_STENCIL_TEXTURE = 41,
+        END_TEXTURE = MAX_TEXTURE_COUNT - 1,
+        CHARACTER_TEXTURE = 32,
+        SCREEN_RESOLUTION = 33,
+        DOWNSAMPLE_TEXTURE = 34,
+        UPSAMPLE_TEXTURE = 35,
+        PLAIN_IMAGE = 36,
+        BLOOM_IMAGE = 37,
+        DEPTH_STENCIL_TEXTURE = 38,
+        TIME = 39,
     }UNIFORM_LOCATIONS;
 
     typedef struct vertex

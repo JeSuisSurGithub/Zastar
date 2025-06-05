@@ -37,7 +37,10 @@ namespace model
 
         for (usz index = 0; index < m_vertices.size(); index++)
         {
-            int pixel_index = std::min((((m_vertices[index].uv.t * width) * width) + (m_vertices[index].uv.s * height)) * channels, ((float)width * (float)height * channels) - 1);
+            int pixel_index = std::min(
+                (((m_vertices[index].uv.t * width) * width) + (m_vertices[index].uv.s * height)) * channels,
+                ((float)width * (float)height * channels) - 1);
+
             float pixel_value = data[pixel_index] / 255.0;
             m_vertices[index].xyz += glm::normalize(m_vertices[index].xyz) * height_filter(pixel_value);
         }
@@ -63,28 +66,24 @@ namespace model
             for (const tinyobj::index_t& index : shape.mesh.indices)
             {
                 vertex vertex{};
-                vertex.xyz =
-                {
+                vertex.xyz = {
                     attrib.vertices[3 * index.vertex_index + 0],
                     attrib.vertices[3 * index.vertex_index + 1],
                     attrib.vertices[3 * index.vertex_index + 2]
                 };
 
-                vertex.normal =
-                {
+                vertex.normal = {
                     attrib.normals[3 * index.normal_index + 0],
                     attrib.normals[3 * index.normal_index + 1],
                     attrib.normals[3 * index.normal_index + 2]
                 };
 
-                vertex.uv =
-                {
+                vertex.uv = {
                     attrib.texcoords[2 * index.texcoord_index + 0],
                     1 - attrib.texcoords[2 * index.texcoord_index + 1]
                 };
 
-                if (unique_vertices.count(vertex) == 0)
-                {
+                if (unique_vertices.count(vertex) == 0) {
                     unique_vertices[vertex] = static_cast<uint32_t>(m_vertices.size());
                     m_vertices.push_back(vertex);
                 }

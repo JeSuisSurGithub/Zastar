@@ -11,7 +11,6 @@
 #include "ubo.hpp"
 #include "window.hpp"
 
-#include <chrono>
 #include <memory>
 
 namespace zsl

@@ -1,5 +1,7 @@
 #include <window.hpp>
 
+#include <stdexcept>
+
 namespace zsl
 {
 namespace window
@@ -30,8 +32,9 @@ namespace window
     void update(window& window_)
     {
         glfwPollEvents();
-        if (is_pressed(window_, GLFW_KEY_ESCAPE))
+        if (is_pressed(window_, GLFW_KEY_ESCAPE)) {
             glfwSetWindowShouldClose(window_.m_window, true);
+        }
     }
 
     void swap_buffers(window& window_)

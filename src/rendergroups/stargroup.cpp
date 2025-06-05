@@ -16,7 +16,9 @@ namespace rendergroups
         glm::vec3 range,
         usz planet_count_)
     :
-    base(create_object(group, model_path, texture_path))
+    base(create_object(group, model_path, texture_path)),
+    planet_count(planet_count_),
+    texture_offset_count(0.0)
     {
         base.m_translation = position;
         base.m_euler_angles = rotation;
@@ -24,8 +26,6 @@ namespace rendergroups
         point_light.color = color;
         point_light.position = position;
         point_light.range = range;
-        planet_count = planet_count_;
-        texture_offset_count = 0.0;
     }
 
     star::~star() {}
@@ -41,9 +41,8 @@ namespace rendergroups
 
     void update(stargroup& context, float delta_time)
     {
-        for (star& cur_object : context.m_stars)
-        {
-            cur_object.texture_offset_count += delta_time * 0.000015;
+        for (star& cur_object : context.m_stars) {
+            cur_object.texture_offset_count += delta_time * 1.0/65536;
         }
     }
 
@@ -53,12 +52,15 @@ namespace rendergroups
         ubo_star cur_ubo;
         for (const star& cur_object : context.m_stars)
         {
-            if (glm::distance(camera_xyz, cur_object.base.m_translation) > ZFAR * 0.65)
+            if (glm::distance(camera_xyz, cur_object.base.m_translation) > ZFAR) {
                 continue;
-            bind(*context.m_base->m_textures[cur_object.base.m_texture_index], cur_object.base.m_texture_index);
+            }
+
+            int texture_index = cur_object.base.m_texture_index;
+            bind(*context.m_base->m_textures[texture_index], texture_index);
             cur_ubo.transform = get_transform_mat(cur_object.base);
             cur_ubo.inverse_transform = glm::inverse(cur_ubo.transform);
-            cur_ubo.texture_index = cur_object.base.m_texture_index;
+            cur_ubo.texture_index = texture_index;
             cur_ubo.texture_offset = cur_object.texture_offset_count;
             memory::update(context.m_ubo, &cur_ubo, sizeof(ubo_star), 0);
             draw(*context.m_base->m_models[cur_object.base.m_model_index]);

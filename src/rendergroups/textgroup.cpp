@@ -61,23 +61,22 @@ namespace rendergroups
     {
         bind(group.m_program);
         bind(group.m_characters, 0);
-        update_vec2(group.m_program,
-            UNIFORM_LOCATIONS::SCREEN_RESOLUTION, framebuffer_size);
+        update_vec2(group.m_program, UNIFORM_LOCATIONS::SCREEN_RESOLUTION, framebuffer_size);
+
         group.m_translations.clear();
         group.m_firsts.clear();
         group.m_counts.clear();
+
         for (const text& cur_text : texts)
         {
-            for (usz count = 0; count < cur_text.text.size(); count++)
-            {
+            for (usz count = 0; count < cur_text.text.size(); count++) {
                 group.m_translations.push_back(glm::vec4(group.m_size * count + cur_text.xy.x, cur_text.xy.y, 0, 0));
                 group.m_firsts.push_back(cur_text.text[count] * 6);
                 group.m_counts.push_back(6);
             }
         }
-        memory::ssbo ssbo_text(
-            SSBO_BINDINGS::TEXT,
-            group.m_translations.data(),
+
+        memory::ssbo ssbo_text(SSBO_BINDINGS::TEXT, group.m_translations.data(),
             group.m_translations.size() * sizeof(glm::vec4));
         glBindVertexArray(group.m_vao);
         glMultiDrawArrays(GL_TRIANGLES, group.m_firsts.data(), group.m_counts.data(), group.m_translations.size());

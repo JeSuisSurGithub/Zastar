@@ -1,4 +1,3 @@
-#include "texture.hpp"
 #include <framebuffer.hpp>
 
 namespace zsl
@@ -43,7 +42,6 @@ namespace framebuffer
         if (glCheckNamedFramebufferStatus(m_fbo, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             throw std::runtime_error("Framebuffer incomplete\n");
 
-
         glm::vec2 mip_size{m_width, m_height};
         glCreateFramebuffers(1, &m_bloom_fbo);
         for (usz index = 0; index < BLOOM_LEVEL; index++)
@@ -59,8 +57,8 @@ namespace framebuffer
 
         update_int(m_upsampler, UNIFORM_LOCATIONS::UPSAMPLE_TEXTURE, 0);
         update_int(m_downsampler, UNIFORM_LOCATIONS::DOWNSAMPLE_TEXTURE, 0);
-        update_int(m_final, UNIFORM_LOCATIONS::COMBINE_MAIN_SCENE, 0);
-        update_int(m_final, UNIFORM_LOCATIONS::COMBINE_BLOOM, 1);
+        update_int(m_final, UNIFORM_LOCATIONS::PLAIN_IMAGE, 0);
+        update_int(m_final, UNIFORM_LOCATIONS::BLOOM_IMAGE, 1);
         update_int(m_final, UNIFORM_LOCATIONS::DEPTH_STENCIL_TEXTURE, 2);
     }
 
@@ -90,16 +88,12 @@ namespace framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, fb_.m_bloom_fbo);
         {
             bind(fb_.m_downsampler);
-            update_vec2(fb_.m_downsampler,
-                UNIFORM_LOCATIONS::SCREEN_RESOLUTION, {fb_.m_width, fb_.m_height});
             texture::bind(*fb_.m_colorbufs[1], 0);
             for (usz index = 0; index < BLOOM_LEVEL; index++)
             {
                 glViewport(0, 0, fb_.m_bloom_colorbufs[index]->m_width, fb_.m_bloom_colorbufs[index]->m_height);
                 bind_to_framebuffer(*fb_.m_bloom_colorbufs[index], fb_.m_bloom_fbo, GL_COLOR_ATTACHMENT0);
                 draw_quad(fb_);
-                update_vec2(fb_.m_downsampler,
-                    UNIFORM_LOCATIONS::SCREEN_RESOLUTION, {fb_.m_bloom_colorbufs[index]->m_width, fb_.m_bloom_colorbufs[index]->m_height});
                 texture::bind(*fb_.m_bloom_colorbufs[index], 0);
             }
         }
@@ -119,9 +113,7 @@ namespace framebuffer
         glViewport(0, 0, fb_.m_width, fb_.m_height);
 
         bind(fb_.m_final);
-        update_vec2(fb_.m_final,
-            UNIFORM_LOCATIONS::SCREEN_RESOLUTION, {fb_.m_width, fb_.m_height});
-        update_float(fb_.m_final, UNIFORM_LOCATIONS::TIME, fb_.m_time);
+        // update_float(fb_.m_final, UNIFORM_LOCATIONS::TIME, fb_.m_time);
         texture::bind(*fb_.m_colorbufs[0], 0);
         texture::bind(*fb_.m_bloom_colorbufs[0], 1);
         texture::bind(fb_.m_depthbuf, 2);
