@@ -3,8 +3,11 @@
 layout(location = 0) in vec2 in_uv;
 layout(location = 0) out vec4 out_rgba;
 layout(location = 40) uniform float seed;
-layout(location = 41) uniform float noise_freq;
-layout(location = 42) uniform float gain_decay;
+
+layout(location = 43) uniform int iterations;
+layout(location = 44) uniform float noise_freq;
+layout(location = 45) uniform float gain_decay;
+layout(location = 46) uniform float freq_gain;
 
 // Random Normalize Gradients
 vec2 gradient(vec2 p)
@@ -62,9 +65,27 @@ float fbm(vec2 uv, int octaves, float base_freq, float gain, float lacunarity)
     return sum;
 }
 
+float positive(float noise) {
+    return noise * 0.5 + 0.5;
+}
+
+float compress_mid_range(float noise) {
+    return pow(positive(noise), 4.0);
+}
+
+float veins(float noise) {
+    return abs(noise);
+}
+
+float double_fbm(vec2 uv, int octaves, float base_freq, float gain, float lacunarity) {
+    float noise = fbm(in_uv, octaves / 2, noise_freq / 2.0, gain_decay, lacunarity);
+    float pnoise = positive(noise);
+
+    return fbm(vec2(pnoise), octaves, noise_freq, gain_decay, lacunarity);
+}
+
 void main()
 {
-    float noise = fbm(in_uv, 5, noise_freq, gain_decay, 2.0);
-    noise = noise * 0.5 + 0.5;
-    out_rgba = vec4(vec3(pow(noise, 4.0)), 1.0);
+    float noise = fbm(in_uv, iterations, noise_freq, gain_decay, freq_gain);
+    out_rgba = vec4(vec3(compress_mid_range(noise)), 1.0);
 }

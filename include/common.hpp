@@ -58,10 +58,12 @@ namespace zsl
         DEPTH_STENCIL_TEXTURE = 38,
         TIME = 39,
         SEED = 40,
-        NOISE_FREQ = 41,
-        GAIN_DECAY = 42,
-        VERTEX_COUNT = 43,
-        HEIGHTMAP = 44,
+        VERTEX_COUNT = 41,
+        HEIGHTMAP = 42,
+        ITERATIONS = 43,
+        NOISE_FREQ = 44,
+        GAIN_DECAY = 45,
+        FREQ_GAIN  = 46,
     }UNIFORM_LOCATIONS;
 
     typedef struct vertex

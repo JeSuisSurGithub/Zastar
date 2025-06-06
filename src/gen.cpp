@@ -40,10 +40,10 @@ namespace gen
         usz count)
     {
         std::shared_ptr<model::model> star_model = std::make_shared<model::model>("models/uvs_flat.obj");
-        noisegen star_tex_gen{"shaders/fbm.frag", glm::vec2(512.f, 512.f), seed, 4.0, 0.5};
+        noisegen star_tex_gen{"shaders/fbm.frag", glm::vec2(512.f, 512.f), seed, 5, 4.0, 0.5, 2.0};
         std::shared_ptr<texture::texture> star_texture = generate(star_tex_gen);
 
-        noisegen hmap_tex_gen{"shaders/fbm.frag", glm::vec2(1024.f, 1024.f), seed, 16.0, 0.7};
+        noisegen hmap_tex_gen{"shaders/fbm.frag", glm::vec2(1024.f, 1024.f), seed, 5, 16.0, 0.7, 2.0};
         std::shared_ptr<texture::texture> height_map = generate(hmap_tex_gen);
         std::shared_ptr<model::model> planet_model = std::make_shared<model::model>("models/uvs_flat2.obj", height_map);
         // std::shared_ptr<texture::texture> planet_texture = std::make_shared<texture::texture>("textures/patatouille.png");
@@ -137,7 +137,7 @@ namespace gen
         std::cout << "Generated " << planet_count << " planets" << std::endl;
     }
 
-    noisegen::noisegen(const std::string& frag_path, glm::vec2 resolution, u32 seed, float freq, float decay)
+    noisegen::noisegen(const std::string& frag_path, glm::vec2 resolution, u32 seed, int iteration, float freq, float decay, float gain)
     :
     m_vao(0),
     m_vbo(0),
@@ -145,8 +145,10 @@ namespace gen
     m_noise_shader("shaders/quad.vert", frag_path, ZSL_LOAD_SPIRV),
     m_tex_size(resolution),
     m_seed(seed),
+    m_iterations(iteration),
     m_noise_freq(freq),
-    m_gain_decay(decay)
+    m_gain_decay(decay),
+    m_lacunarity(gain)
     {
         glCreateBuffers(1, &m_vbo);
         glNamedBufferStorage(m_vbo, sizeof(framebuffer::FULL_QUAD), &framebuffer::FULL_QUAD, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
@@ -184,8 +186,10 @@ namespace gen
         bind(gen_.m_noise_shader);
         shader::update_vec2(gen_.m_noise_shader, UNIFORM_LOCATIONS::SCREEN_RESOLUTION, gen_.m_tex_size);
         shader::update_float(gen_.m_noise_shader, UNIFORM_LOCATIONS::SEED, lehmer_randrange_flt(gen_.m_seed, 0.0, 1.0));
+        shader::update_int(gen_.m_noise_shader, UNIFORM_LOCATIONS::ITERATIONS, gen_.m_iterations);
         shader::update_float(gen_.m_noise_shader, UNIFORM_LOCATIONS::NOISE_FREQ, gen_.m_noise_freq);
         shader::update_float(gen_.m_noise_shader, UNIFORM_LOCATIONS::GAIN_DECAY, gen_.m_gain_decay);
+        shader::update_float(gen_.m_noise_shader, UNIFORM_LOCATIONS::FREQ_GAIN, gen_.m_lacunarity);
 
         glViewport(0, 0, gen_.m_tex_size.x, gen_.m_tex_size.y);
 

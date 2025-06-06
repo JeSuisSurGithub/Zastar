@@ -34,10 +34,12 @@ namespace zsl
 
             glm::vec2 m_tex_size;
             u32 m_seed;
+            int m_iterations;
             float m_noise_freq;
             float m_gain_decay;
+            float m_lacunarity;
 
-            noisegen(const std::string& frag_path, glm::vec2 resolution, u32 seed, float freq, float decay);
+            noisegen(const std::string& frag_path, glm::vec2 resolution, u32 seed, int iteration, float freq, float decay, float gain);
             ~noisegen();
         }noisegen;
 
