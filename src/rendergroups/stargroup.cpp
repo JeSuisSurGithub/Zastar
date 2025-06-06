@@ -7,8 +7,8 @@ namespace rendergroups
 {
     star::star(
         rendergroup& group,
-        const std::string& model_path,
-        const std::string& texture_path,
+        std::shared_ptr<model::model> model,
+        std::shared_ptr<texture::texture> texture,
         glm::vec3 position,
         glm::vec3 rotation,
         glm::vec3 scale,
@@ -16,7 +16,7 @@ namespace rendergroups
         glm::vec3 range,
         usz planet_count_)
     :
-    base(create_object(group, model_path, texture_path)),
+    base(create_object(group, model, texture)),
     planet_count(planet_count_),
     texture_offset_count(0.0)
     {
@@ -32,9 +32,10 @@ namespace rendergroups
 
     stargroup::stargroup()
     :
+    m_base("shaders/stars.vert", "shaders/stars.frag"),
+    m_stars(),
     m_ubo(UBO_BINDINGS::STAR, nullptr, sizeof(ubo_star))
     {
-        m_base = std::make_unique<rendergroup>("shaders/stars.vert", "shaders/stars.frag");
     }
 
     stargroup::~stargroup() {}
@@ -48,7 +49,7 @@ namespace rendergroups
 
     void render(stargroup& context, glm::vec3 camera_xyz)
     {
-        bind(*context.m_base->m_program);
+        bind(context.m_base.m_shader);
         ubo_star cur_ubo;
         for (const star& cur_object : context.m_stars)
         {
@@ -57,13 +58,13 @@ namespace rendergroups
             }
 
             int texture_index = cur_object.base.m_texture_index;
-            bind(*context.m_base->m_textures[texture_index], texture_index);
+            bind(*context.m_base.m_textures[texture_index], texture_index);
             cur_ubo.transform = get_transform_mat(cur_object.base);
             cur_ubo.inverse_transform = glm::inverse(cur_ubo.transform);
             cur_ubo.texture_index = texture_index;
             cur_ubo.texture_offset = cur_object.texture_offset_count;
             memory::update(context.m_ubo, &cur_ubo, sizeof(ubo_star), 0);
-            draw(*context.m_base->m_models[cur_object.base.m_model_index]);
+            draw(*context.m_base.m_models[cur_object.base.m_model_index]);
         }
     }
 

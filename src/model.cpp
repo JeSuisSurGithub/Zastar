@@ -1,6 +1,7 @@
 #include <model.hpp>
 
-#include <algorithm>
+#include <shader.hpp>
+#include <ubo.hpp>
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <ext/tiny_obj_loader.h>
@@ -10,45 +11,26 @@ namespace zsl
 {
 namespace model
 {
-    model::model(
-        const std::string& model_path)
+    u64 model::s_next_id{1};
+
+    model::model(const std::string& model_path)
     :
-    m_model_path(model_path),
-    m_height_map_path("")
+    m_id(s_next_id++)
     {
-        load_obj();
+        load_obj(model_path);
         load_obj_to_gpu();
     }
 
-    model::model(
-        const std::string& model_path,
-        const std::string& height_map_path,
-        std::function<float(float)> height_filter)
+    model::model(const std::string& model_path, std::shared_ptr<texture::texture> height_map)
     :
-    m_model_path(model_path),
-    m_height_map_path(height_map_path)
+    m_id(s_next_id++)
     {
-        load_obj();
-        int width;
-        int height;
-        int channels;
-        stbi_uc* data = stbi_load(m_height_map_path.c_str(), &width, &height, &channels, 0);
-        if (!data) { throw std::invalid_argument("Could not load height map\n"); }
-
-        for (usz index = 0; index < m_vertices.size(); index++)
-        {
-            int pixel_index = std::min(
-                (((m_vertices[index].uv.t * width) * width) + (m_vertices[index].uv.s * height)) * channels,
-                ((float)width * (float)height * channels) - 1);
-
-            float pixel_value = data[pixel_index] / 255.0;
-            m_vertices[index].xyz += glm::normalize(m_vertices[index].xyz) * height_filter(pixel_value);
-        }
-        stbi_image_free(data);
+        load_obj(model_path);
+        heightmap(m_vertices, height_map);
         load_obj_to_gpu();
     }
 
-    void model::load_obj()
+    void model::load_obj(const std::string& model_path)
     {
         tinyobj::attrib_t attrib;
         std::vector<tinyobj::shape_t> shapes;
@@ -56,7 +38,7 @@ namespace model
         std::string warn;
         std::string err;
 
-        if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, m_model_path.c_str()))
+        if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, model_path.c_str()))
             throw std::runtime_error(warn + err);
 
         std::unordered_map<vertex, uint32_t> unique_vertices{};
@@ -128,17 +110,32 @@ namespace model
         glDeleteBuffers(1, &m_ebo);
     }
 
-    float default_height_filter(float pixel_value)
-    {
-        float displacement =  (1.0 - pixel_value) + 1.0;
-        return displacement / 2.0;
-    }
-
     void draw(model& model_)
     {
         glBindVertexArray(model_.m_vao);
         glDrawElements(GL_TRIANGLES, model_.m_indices.size(), GL_UNSIGNED_INT, nullptr);
         glBindVertexArray(0);
+    }
+
+
+
+    void heightmap(std::vector<vertex>& vertices, std::shared_ptr<texture::texture> height_map)
+    {
+        memory::ssbo ssbo_vertex{SSBO_BINDINGS::VERTEX, vertices.data(), vertices.size() * sizeof(vertex)};
+
+        texture::bind(*height_map, 0);
+
+        shader::shader heightmap_shader{"shaders/heightmap.comp", ZSL_LOAD_SPIRV};
+        shader::bind(heightmap_shader);
+        update_int(heightmap_shader, UNIFORM_LOCATIONS::VERTEX_COUNT, static_cast<int>(vertices.size()));
+        update_int(heightmap_shader, UNIFORM_LOCATIONS::HEIGHTMAP, 0);
+
+        GLuint local_size_x = 256;
+        GLuint num_groups = (vertices.size() + local_size_x - 1) / local_size_x;
+        glDispatchCompute(num_groups, 1, 1);
+        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+        glGetNamedBufferSubData(ssbo_vertex.m_ssbo, 0, vertices.size() * sizeof(vertex), vertices.data());
     }
 }
 }

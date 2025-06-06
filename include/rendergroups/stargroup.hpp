@@ -26,8 +26,8 @@ namespace zsl
 
             star(
                 rendergroup& group,
-                const std::string& model_path,
-                const std::string& texture_path,
+                std::shared_ptr<model::model> model,
+                std::shared_ptr<texture::texture> texture,
                 glm::vec3 position,
                 glm::vec3 rotation,
                 glm::vec3 scale,
@@ -44,7 +44,7 @@ namespace zsl
             stargroup(stargroup &&) = delete;
             stargroup &operator=(stargroup &&) = delete;
 
-            std::unique_ptr<rendergroup> m_base;
+            rendergroup m_base;
 
             std::vector<star> m_stars;
 

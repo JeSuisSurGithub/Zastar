@@ -52,6 +52,8 @@ target("zastar")
     -- Shaders
     add_rules("utils.glsl2spv", {client = "opengl100", outputdir = "build/shaders"})
     add_files(
+        "shaders/heightmap.comp",
+        "shaders/fbm.frag",
         "shaders/quad.vert",
         "shaders/downsampler.frag",
         "shaders/upsampler.frag",

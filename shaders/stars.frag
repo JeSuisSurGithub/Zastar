@@ -40,7 +40,7 @@ vec3 calc_point_light(vec3 position, vec3 range, vec3 color, vec3 normal, vec3 f
     float distance = length(position - frag_xyz);
     float attenuation = 1.0 / (range.x + range.y * distance + range.z * (distance * distance));
 
-    vec3 ambient = 0.1 * color * attenuation;
+    vec3 ambient = color * attenuation;
     vec3 diffuse = base_diffuse * color * attenuation;
     return (ambient + diffuse);
 }
@@ -59,7 +59,7 @@ void main()
     }
 
     vec3 texture_color = texture(textures[texture_index], vec2(in_uv.s, in_uv.t + texture_offset)).rgb;
-    vec4 hdr_color = vec4(lighting * max(texture_color, 1.0/32), 1.0);
+    vec4 hdr_color = vec4(lighting * texture_color, 1.0);
     out_rgba = hdr_color;
 
     float brightness = dot(out_rgba.rgb, vec3(0.2126, 0.7152, 0.0722));

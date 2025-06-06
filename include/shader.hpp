@@ -3,7 +3,6 @@
 
 #include "common.hpp"
 
-#include <fstream>
 #include <vector>
 
 namespace zsl
@@ -17,9 +16,10 @@ namespace zsl
             shader(shader &&) = delete;
             shader &operator=(shader &&) = delete;
 
-            GLuint m_id;
+            GLuint m_program;
 
             shader(const std::string& vertpath, const std::string& fragpath, bool load_spirv);
+            shader(const std::string& comppath, bool load_spirv);
             ~shader();
         }shader;
 

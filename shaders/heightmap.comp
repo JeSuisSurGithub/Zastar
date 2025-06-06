@@ -1,0 +1,36 @@
+#version 460 core
+
+layout(local_size_x = 256, local_size_y = 1, local_size_z = 1) in;
+
+layout (location = 43) uniform int vertex_count;
+layout (location = 44) uniform sampler2D heightmap;
+
+struct vertex
+{
+    vec3 xyz;
+    float pad0_;
+    vec3 normal;
+    float pad1_;
+    vec2 uv;
+    vec2 pad2_;
+};
+
+layout (std140, binding = 1) buffer ssbo_vertex
+{
+    vertex vertices[];
+};
+
+void main()
+{
+    uint idx = gl_GlobalInvocationID.x;
+    if (idx >= vertex_count) {
+        return;
+    }
+
+    vertex v = vertices[idx];
+    if (abs(0.5 - v.uv.t) < (0.5 - 1.0/256.0)) {
+        float height = (texture(heightmap, v.uv).r + texture(heightmap, v.uv).g + texture(heightmap, v.uv).b) / 3.0;
+        v.xyz += normalize(v.xyz) * height;
+        vertices[idx] = v;
+    }
+}

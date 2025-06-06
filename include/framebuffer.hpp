@@ -10,7 +10,7 @@ namespace zsl
 {
     namespace framebuffer
     {
-        constexpr float SCREEN_VERTICES[] =
+        constexpr float FULL_QUAD[] =
         {
             -1.0,  1.0,  0.0, 1.0,
             -1.0, -1.0,  0.0, 0.0,
@@ -57,8 +57,8 @@ namespace zsl
             ~framebuffer();
         }framebuffer;
 
-        void prepare_render(framebuffer& fb_);
-        void end_render(framebuffer& fb_, float delta_time);
+        void prepare_fb(framebuffer& fb_);
+        void render_w_fx(framebuffer& fb_, float delta_time);
         void draw_quad(framebuffer& fb_);
     }
 }

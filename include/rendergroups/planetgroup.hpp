@@ -1,11 +1,10 @@
 #ifndef PLANETGROUP_HPP
 #define PLANETGROUP_HPP
 
+#include "common.hpp"
 #include "rendergroup.hpp"
 #include "ubo.hpp"
 #include "rendergroups/stargroup.hpp"
-
-#include <memory>
 
 namespace zsl
 {
@@ -38,9 +37,8 @@ namespace zsl
 
             planet(
                 rendergroup& group,
-                const std::string& model_path,
-                const std::string& texture_path,
-                const std::string& height_map_path,
+                std::shared_ptr<model::model> model,
+                std::shared_ptr<texture::texture> texture,
                 glm::vec3 position,
                 glm::vec3 rotation,
                 glm::vec3 scale,
@@ -59,7 +57,7 @@ namespace zsl
             planetgroup(planetgroup &&) = delete;
             planetgroup &operator=(planetgroup &&) = delete;
 
-            std::unique_ptr<rendergroup> m_base;
+            rendergroup m_base;
 
             std::vector<planet> m_planets;
 

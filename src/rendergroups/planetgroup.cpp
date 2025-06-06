@@ -7,9 +7,8 @@ namespace rendergroups
 {
     planet::planet(
         rendergroup& group,
-        const std::string& model_path,
-        const std::string& texture_path,
-        const std::string& height_map_path,
+        std::shared_ptr<model::model> model,
+        std::shared_ptr<texture::texture> texture,
         glm::vec3 position,
         glm::vec3 rotation,
         glm::vec3 scale,
@@ -19,7 +18,7 @@ namespace rendergroups
         float orbit_speed_,
         float cur_angle_)
     :
-    base(create_object(group, model_path, texture_path, height_map_path)),
+    base(create_object(group, model, texture)),
     material_(material__),
     distance_to_star(distance_to_star_),
     rev_speed(rev_speed_),
@@ -35,9 +34,10 @@ namespace rendergroups
 
     planetgroup::planetgroup()
     :
+    m_base("shaders/planets.vert", "shaders/planets.frag"),
+    m_planets(),
     m_ubo(UBO_BINDINGS::PLANET, nullptr, sizeof(ubo_planet))
     {
-        m_base = std::make_unique<rendergroup>("shaders/planets.vert", "shaders/planets.frag");
     }
 
     planetgroup::~planetgroup() {}
@@ -67,7 +67,7 @@ namespace rendergroups
 
     void render(planetgroup& context, glm::vec3 camera_xyz)
     {
-        bind(*context.m_base->m_program);
+        bind(context.m_base.m_shader);
         ubo_planet cur_ubo;
         for (const planet& cur_object : context.m_planets)
         {
@@ -77,13 +77,13 @@ namespace rendergroups
 
             int texture_index = cur_object.base.m_texture_index;
 
-            bind(*context.m_base->m_textures[texture_index], texture_index);
+            bind(*context.m_base.m_textures[texture_index], texture_index);
             cur_ubo.transform = get_transform_mat(cur_object.base);
             cur_ubo.inverse_transform = glm::inverse(cur_ubo.transform);
             cur_ubo.texture_index = texture_index;
             cur_ubo.material_ = cur_object.material_;
             memory::update(context.m_ubo, &cur_ubo, sizeof(ubo_planet), 0);
-            draw(*context.m_base->m_models[cur_object.base.m_model_index]);
+            draw(*context.m_base.m_models[cur_object.base.m_model_index]);
         }
     }
 }

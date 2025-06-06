@@ -83,7 +83,7 @@ void main()
             view_direction);
     }
 
-    vec3 texture_color = texture(textures[texture_index], in_uv).rgb;
+    vec3 texture_color = vec3(0.5) - texture(textures[texture_index], in_uv).rgb;
     vec4 hdr_color = vec4(lighting * texture_color, 1.0);
     out_rgba = hdr_color;
 

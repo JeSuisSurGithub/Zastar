@@ -14,8 +14,10 @@ namespace zsl
             texture(texture &&) = delete;
             texture &operator=(texture &&) = delete;
 
-            const std::string m_texture_path;
-            GLuint m_id;
+            static u64 s_next_id;
+            u64 m_id;
+
+            GLuint m_tex;
             i32 m_width;
             i32 m_height;
 

@@ -2,8 +2,8 @@
 #define ZSLMODEL_HPP
 
 #include "common.hpp"
-
-#include <unordered_map>
+#include "texture.hpp"
+#include <memory>
 
 namespace std
 {
@@ -23,8 +23,6 @@ namespace zsl
 {
     namespace model
     {
-        float default_height_filter(float pixel_value);
-
         typedef struct model
         {
             model(const model &) = delete;
@@ -32,8 +30,8 @@ namespace zsl
             model(model &&) = delete;
             model &operator=(model &&) = delete;
 
-            const std::string m_model_path;
-            const std::string m_height_map_path;
+            static u64 s_next_id;
+            u64 m_id;
 
             std::vector<vertex> m_vertices;
             std::vector<u32> m_indices;
@@ -42,18 +40,15 @@ namespace zsl
             GLuint m_vao;
             GLuint m_ebo;
 
-            model(
-                const std::string& model_path
-            );
-            model(
-                const std::string& model_path,
-                const std::string& height_map_path,
-                std::function<float(float)> height_filter = default_height_filter);
+            model(const std::string& model_path);
+            model(const std::string& model_path, std::shared_ptr<texture::texture> height_map);
             ~model();
 
-            void load_obj();
+            void load_obj(const std::string& model_path);
             void load_obj_to_gpu();
         }model;
+
+        void heightmap(std::vector<vertex>& vertices, std::shared_ptr<texture::texture> height_map);
 
         void draw(model& model_);
     }

@@ -32,7 +32,7 @@ namespace zsl
             GLuint m_vbo;
 
             texture::texture m_characters;
-            shader::shader m_program;
+            shader::shader m_shader;
 
             textgroup(usz size);
             ~textgroup();

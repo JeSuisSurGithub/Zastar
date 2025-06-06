@@ -34,92 +34,68 @@ namespace rendergroups
 
     rendergroup::rendergroup(const std::string& vert_path, const std::string& frag_path)
     :
-    m_program(std::make_unique<shader::shader>(vert_path, frag_path, ZSL_LOAD_SPIRV))
+    m_shader(vert_path, frag_path, ZSL_LOAD_SPIRV),
+    m_textures(),
+    m_models()
     {
         GLint values[MAX_TEXTURE_COUNT];
         for (usz index = 0; index < MAX_TEXTURE_COUNT; index++)
             values[index] = index;
-        update_int_array(*m_program, UNIFORM_LOCATIONS::TEXTURE, values, MAX_TEXTURE_COUNT);
+        update_int_array(m_shader, UNIFORM_LOCATIONS::TEXTURE, values, MAX_TEXTURE_COUNT);
     }
 
     rendergroup::~rendergroup() {}
-
-    object create_object(rendergroup& group, const std::string& model_path, const std::string& texture_path)
-    {
-        u32 model_index = add_model(group, model_path);
-        u32 texture_index = add_texture(group, texture_path);
-        return create_object(model_index, texture_index);
-    }
-
-    object create_object(
-        rendergroup& group,
-        const std::string& model_path,
-        const std::string& texture_path,
-        const std::string& height_map_path)
-    {
-        u32 model_index = add_model(group, model_path, height_map_path);
-        u32 texture_index = add_texture(group, texture_path);
-        return create_object(model_index, texture_index);
-    }
 
     object create_object(u32 model_index, u32 texture_index)
     {
         return object(model_index, texture_index);
     }
 
-    u32 add_model(rendergroup& group, const std::string& model_path)
+    object create_object(
+            rendergroup& group,
+            std::shared_ptr<model::model> model,
+            std::shared_ptr<texture::texture> tex)
     {
-        std::vector<std::unique_ptr<model::model>>::iterator iterator = std::find_if(
-            group.m_models.begin(),
-            group.m_models.end(),
-            [&](std::unique_ptr<model::model>& model) -> bool {
-            return (model->m_model_path == model_path);
-        });
-
-        if (iterator == std::end(group.m_models)) {
-            group.m_models.push_back(std::make_unique<model::model>(model_path));
-            return group.m_models.size() - 1;
-        }
-        return std::distance(std::begin(group.m_models), iterator);
+        u32 model_index = add_model(group, model);
+        u32 texture_index = add_texture(group, tex);
+        return create_object(model_index, texture_index);
     }
 
     u32 add_model(
         rendergroup& group,
-        const std::string& model_path,
-        const std::string& height_map_path)
+        std::shared_ptr<model::model> model_)
     {
-        std::vector<std::unique_ptr<model::model>>::iterator iterator = std::find_if(
+        std::vector<std::shared_ptr<model::model>>::iterator iterator = std::find_if(
             group.m_models.begin(),
             group.m_models.end(),
-            [&](std::unique_ptr<model::model>& model) -> bool
+            [&](std::shared_ptr<model::model>& model) -> bool
         {
-            return (model->m_model_path == model_path) && (model->m_height_map_path == height_map_path);
+            return (model->m_id == model_->m_id);
         });
 
         if (iterator == std::end(group.m_models)) {
-            group.m_models.push_back(std::make_unique<model::model>(model_path, height_map_path));
+            group.m_models.push_back(model_);
             return group.m_models.size() - 1;
         }
         return std::distance(std::begin(group.m_models), iterator);
     }
 
-    u32 add_texture(rendergroup& group, const std::string& texture_path)
+    u32 add_texture(rendergroup& group, std::shared_ptr<texture::texture> tex)
     {
         if (group.m_textures.size() == MAX_TEXTURE_COUNT)
             throw std::logic_error("Maximum texture count reached");
 
-        std::vector<std::unique_ptr<texture::texture>>::iterator iterator = std::find_if(
+        std::vector<std::shared_ptr<texture::texture>>::iterator iterator = std::find_if(
             group.m_textures.begin(),
             group.m_textures.end(),
-            [&](std::unique_ptr<texture::texture>& texture) -> bool
+            [&](std::shared_ptr<texture::texture>& texture) -> bool
         {
-            return (texture->m_texture_path == texture_path);
+            return (texture->m_id == tex->m_id);
         });
 
         if (iterator == std::end(group.m_textures)) {
-            u32 texture_index = group.m_textures.size();
-            group.m_textures.push_back(std::make_unique<texture::texture>(texture_path));
-            return texture_index;
+            group.m_textures.push_back(tex);
+            return group.m_textures.size() - 1;
         }
         return std::distance(std::begin(group.m_textures), iterator);
     }

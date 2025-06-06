@@ -22,6 +22,7 @@ namespace zsl
     typedef std::int32_t i32;
     typedef std::uint8_t u8;
     typedef std::uint32_t u32;
+    typedef std::uint64_t u64;
     typedef signed long long int isz;
     typedef std::size_t usz;
 
@@ -40,7 +41,8 @@ namespace zsl
 
     typedef enum
     {
-        TEXT = 0
+        TEXT = 0,
+        VERTEX = 1
     }SSBO_BINDINGS;
 
     typedef enum
@@ -55,13 +57,21 @@ namespace zsl
         BLOOM_IMAGE = 37,
         DEPTH_STENCIL_TEXTURE = 38,
         TIME = 39,
+        SEED = 40,
+        NOISE_FREQ = 41,
+        GAIN_DECAY = 42,
+        VERTEX_COUNT = 43,
+        HEIGHTMAP = 44,
     }UNIFORM_LOCATIONS;
 
     typedef struct vertex
     {
         glm::vec3 xyz;
+        float pad0_;
         glm::vec3 normal;
+        float pad1_;
         glm::vec2 uv;
+        glm::vec2 pad2_;
         bool operator==(const struct vertex& cmp) const
         {
             return (xyz == cmp.xyz && normal == cmp.normal && uv == cmp.uv);

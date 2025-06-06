@@ -36,29 +36,25 @@ namespace zsl
             rendergroup(rendergroup &&) = delete;
             rendergroup &operator=(rendergroup &&) = delete;
 
-            std::unique_ptr<shader::shader> m_program;
+            shader::shader m_shader;
             // Beware if writing remove texture
-            std::vector<std::unique_ptr<texture::texture>> m_textures;
-            std::vector<std::unique_ptr<model::model>> m_models;
+            std::vector<std::shared_ptr<texture::texture>> m_textures;
+            std::vector<std::shared_ptr<model::model>> m_models;
 
             rendergroup(const std::string& vert_path, const std::string& frag_path);
             ~rendergroup();
         }rendergroup;
 
-        object create_object(rendergroup& group, const std::string& model_path, const std::string& texture_path);
-        object create_object(
-            rendergroup& group,
-            const std::string& model_path,
-            const std::string& texture_path,
-            const std::string& height_map_path);
         object create_object(u32 model_index, u32 texture_index);
 
-        u32 add_model(rendergroup& group, const std::string& model_path);
-        u32 add_model(
+        object create_object(
             rendergroup& group,
-            const std::string& model_path,
-            const std::string& height_map_path);
-        u32 add_texture(rendergroup& group, const std::string& texture_path);
+            std::shared_ptr<model::model> model,
+            std::shared_ptr<texture::texture> tex);
+
+        u32 add_model(rendergroup& group, std::shared_ptr<model::model> model);
+
+        u32 add_texture(rendergroup& group, std::shared_ptr<texture::texture> tex);
     }
 }
 

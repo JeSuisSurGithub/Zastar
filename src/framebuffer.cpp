@@ -15,7 +15,7 @@ namespace framebuffer
     m_time(previous_count)
     {
         glCreateBuffers(1, &m_vbo);
-        glNamedBufferStorage(m_vbo, sizeof(SCREEN_VERTICES), &SCREEN_VERTICES, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
+        glNamedBufferStorage(m_vbo, sizeof(FULL_QUAD), &FULL_QUAD, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
 
         glCreateVertexArrays(1, &m_vao);
         glVertexArrayVertexBuffer(m_vao, 0, m_vbo, 0, (4 * sizeof(float)));
@@ -70,7 +70,7 @@ namespace framebuffer
         glDeleteFramebuffers(1, &m_bloom_fbo);
     }
 
-    void prepare_render(framebuffer& fb_)
+    void prepare_fb(framebuffer& fb_)
     {
         glClearNamedFramebufferfv(0, GL_COLOR, 0, CLEAR_COLOR);
         glClearNamedFramebufferfv(0, GL_DEPTH, 0, &CLEAR_DEPTH);
@@ -80,9 +80,10 @@ namespace framebuffer
         glClearNamedFramebufferiv(fb_.m_fbo, GL_STENCIL, 0, &CLEAR_STENCIL);
         glClearNamedFramebufferfv(fb_.m_fbo, GL_COLOR, 1, CLEAR_COLOR);
         glBindFramebuffer(GL_FRAMEBUFFER, fb_.m_fbo);
+        glViewport(0, 0, fb_.m_width, fb_.m_height);
     }
 
-    void end_render(framebuffer& fb_, float delta_time)
+    void render_w_fx(framebuffer& fb_, float delta_time)
     {
         fb_.m_time += delta_time;
         glBindFramebuffer(GL_FRAMEBUFFER, fb_.m_bloom_fbo);

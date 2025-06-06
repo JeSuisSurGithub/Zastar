@@ -1,4 +1,3 @@
-#include <sstream>
 #include <ctx.hpp>
 
 #include <chrono>
@@ -58,8 +57,7 @@ namespace zsl
     m_window(),
     m_controls(m_window)
     {
-        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-        {
+        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
             throw std::runtime_error("Failed to initialize GLAD\n");
         }
 
@@ -78,8 +76,7 @@ namespace zsl
             std::cout << '\t' << glGetStringi(GL_EXTENSIONS, count) << std::endl;
         std::cout << "SEED: " << seed << std::endl;
 
-        if (opengl_debug)
-        {
+        if (opengl_debug) {
             glEnable(GL_DEBUG_OUTPUT);
             glDebugMessageCallback(opengl_debug_callback, 0);
         }
@@ -104,14 +101,13 @@ namespace zsl
         m_planetgroup = std::make_unique<rendergroups::planetgroup>();
         m_textgroup = std::make_unique<rendergroups::textgroup>(TEXT_SIZE);
 
-        generate(*m_stargroup, *m_planetgroup, seed, 32);
-        ubo_shared ubo_point_lights;
-        for (ubo_point_lights.point_light_count = 0; ubo_point_lights.point_light_count < m_stargroup->m_stars.size(); ubo_point_lights.point_light_count++)
-        {
-            ubo_point_lights.point_lights[ubo_point_lights.point_light_count]
-                = m_stargroup->m_stars[ubo_point_lights.point_light_count].point_light;
+        gen::generate(*m_stargroup, *m_planetgroup, seed, 32);
+        ubo_shared shared;
+        for (shared.point_light_count = 0; shared.point_light_count < m_stargroup->m_stars.size(); shared.point_light_count++) {
+            shared.point_lights[shared.point_light_count]
+                = m_stargroup->m_stars[shared.point_light_count].point_light;
         }
-        m_ubo = std::make_unique<memory::ubo>(UBO_BINDINGS::SHARED, (void*)&ubo_point_lights, ubo_shared_size);
+        m_ubo = std::make_unique<memory::ubo>(UBO_BINDINGS::SHARED, (void*)&shared, ubo_shared_size);
     }
 
     ctx::~ctx() {}
@@ -178,17 +174,20 @@ namespace zsl
             if (scroll_text_xy.x < -((isz)TEXT_SIZE * (isz)scroll_text.size()))
                 scroll_text_xy.x = dimensions.x;
 
-            prepare_render(*ctx_.m_framebuffer);
+            // Begin
+            prepare_fb(*ctx_.m_framebuffer);
                 if (ctx_.m_controls.m_wireframe.toggled) { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); };
                 rendergroups::render(*ctx_.m_stargroup, cur_ubo.camera_xyz);
                 rendergroups::render(*ctx_.m_planetgroup, cur_ubo.camera_xyz);
                 if (ctx_.m_controls.m_wireframe.toggled) { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); };
+            // Render post processed scene
+            render_w_fx(*ctx_.m_framebuffer, delta_time);
+            // UI
                 rendergroups::render(*ctx_.m_textgroup, dimensions, texts);
-            end_render(*ctx_.m_framebuffer, delta_time);
-
+            // End
             swap_buffers(ctx_.m_window);
-            frame_count++;
 
+            frame_count++;
             do
             {
                 new_time = std::chrono::high_resolution_clock::now();
