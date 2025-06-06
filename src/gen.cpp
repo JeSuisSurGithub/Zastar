@@ -176,21 +176,24 @@ namespace gen
     {
         std::shared_ptr<texture::texture> noise =
             std::make_shared<texture::texture>(gen_.m_tex_size.x, gen_.m_tex_size.y, GL_LINEAR, GL_REPEAT, GL_RGBA8);
+
         bind_to_framebuffer(*noise, gen_.m_fbo, GL_COLOR_ATTACHMENT0);
+
+        GLuint attachments[1] = { GL_COLOR_ATTACHMENT0 };
+        glNamedFramebufferDrawBuffers(gen_.m_fbo, 1, attachments);
 
         GLenum status = glCheckNamedFramebufferStatus(gen_.m_fbo, GL_FRAMEBUFFER);
         if (status != GL_FRAMEBUFFER_COMPLETE)
             throw std::runtime_error("Off screen framebuffer not complete");
 
-        glBindFramebuffer(GL_FRAMEBUFFER, gen_.m_fbo);
-        bind(gen_.m_noise_shader);
-        shader::update_vec2(gen_.m_noise_shader, UNIFORM_LOCATIONS::SCREEN_RESOLUTION, gen_.m_tex_size);
         shader::update_float(gen_.m_noise_shader, UNIFORM_LOCATIONS::SEED, lehmer_randrange_flt(gen_.m_seed, 0.0, 1.0));
         shader::update_int(gen_.m_noise_shader, UNIFORM_LOCATIONS::ITERATIONS, gen_.m_iterations);
         shader::update_float(gen_.m_noise_shader, UNIFORM_LOCATIONS::NOISE_FREQ, gen_.m_noise_freq);
         shader::update_float(gen_.m_noise_shader, UNIFORM_LOCATIONS::GAIN_DECAY, gen_.m_gain_decay);
         shader::update_float(gen_.m_noise_shader, UNIFORM_LOCATIONS::FREQ_GAIN, gen_.m_lacunarity);
+        bind(gen_.m_noise_shader);
 
+        glBindFramebuffer(GL_FRAMEBUFFER, gen_.m_fbo);
         glViewport(0, 0, gen_.m_tex_size.x, gen_.m_tex_size.y);
 
         glBindVertexArray(gen_.m_vao);

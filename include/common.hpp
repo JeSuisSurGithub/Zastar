@@ -1,7 +1,11 @@
 #ifndef ZSLCOMMON_HPP
 #define ZSLCOMMON_HPP
 
-#define ZSL_LOAD_SPIRV true
+#ifdef __unix__
+    #define ZSL_LOAD_SPIRV true
+#elif defined(_WIN32) || defined(WIN32)
+    #define ZSL_LOAD_SPIRV false
+#endif
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
