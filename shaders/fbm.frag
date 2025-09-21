@@ -2,8 +2,8 @@
 
 layout(location = 0) in vec2 in_uv;
 layout(location = 0) out vec4 out_rgba;
-layout(location = 40) uniform float seed;
 
+layout(location = 40) uniform float seed;
 layout(location = 43) uniform int iterations;
 layout(location = 44) uniform float noise_freq;
 layout(location = 45) uniform float gain_decay;

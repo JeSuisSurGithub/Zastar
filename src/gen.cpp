@@ -48,7 +48,7 @@ namespace gen
         std::shared_ptr<model::model> planet_model = std::make_shared<model::model>("models/uvs_flat2.obj", height_map);
         // std::shared_ptr<texture::texture> planet_texture = std::make_shared<texture::texture>("textures/patatouille.png");
 
-        const glm::vec3 RGB_BIAS = {2.0, 1.0, 1.5};
+        const glm::vec3 RGB_BIAS = {2.0, 2.0, 2.0};
         const float pi = glm::pi<float>();
         usz planet_count = 0;
         std::cout << "Generating " << count << " solar systems..." << std::endl;
