@@ -68,7 +68,7 @@ namespace zsl
         }planetgroup;
 
         void update(planetgroup& context, float delta_time, const std::vector<star>& stars);
-        void render(planetgroup& context, glm::vec3 camera_xyz);
+        void render(planetgroup& context, glm::vec3 camera_xyz, const glm::vec3& forward, float fov);
     }
 }
 

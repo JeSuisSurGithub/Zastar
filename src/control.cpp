@@ -6,25 +6,30 @@ float g_fov = 45.0;
 
 namespace zsl
 {
-namespace controls
-{
-    controls::controls(window::window& window_)
-    :
-    m_move_speed(0.5),
-    m_view_speed(.000001),
-    m_horizontal_angle(3.14),
-    m_vertical_angle(0.0),
-    m_show_mouse({.toggled = false, .waited_time = 0, .wait_time = 200, .key =  KEYMAP::SHOW_MOUSE}),
-    m_freeze({.toggled = false, .waited_time = 0, .wait_time = 200, .key =  KEYMAP::FREEZE}),
-    m_wireframe({.toggled = false, .waited_time = 0, .wait_time = 200, .key =  KEYMAP::WIREFRAME}),
-    m_camera_xyz(glm::vec3(0.0, 0.0, 5.0))
-    {
-        set_scroll_callback(window_, scroll_callback);
-    }
+namespace controls {
+using glm::vec3;
+
+controls::controls(window::window &window_)
+    : m_move_speed(0.5), m_view_speed(.000001), m_horizontal_angle(3.14),
+      m_vertical_angle(0.0), m_show_mouse({.toggled = false,
+                                           .waited_time = 0,
+                                           .wait_time = 200,
+                                           .key = KEYMAP::SHOW_MOUSE}),
+      m_freeze({.toggled = false,
+                .waited_time = 0,
+                .wait_time = 200,
+                .key = KEYMAP::FREEZE}),
+      m_wireframe({.toggled = false,
+                   .waited_time = 0,
+                   .wait_time = 200,
+                   .key = KEYMAP::WIREFRAME}),
+      m_camera_xyz(glm::vec3(0.0, 0.0, 5.0)) {
+  set_scroll_callback(window_, scroll_callback);
+}
 
     controls::~controls() {}
 
-    glm::mat4 process_controls(controls& context, window::window& window_, float delta_time)
+    glm::mat4 process_controls(controls& context, window::window& window_, float delta_time, glm::vec3& forward)
     {
         window::window_size dimensions = window::get_size(window_);
         bool changed = update_toggle(context.m_show_mouse, window_, delta_time);
@@ -49,7 +54,7 @@ namespace controls
                     context.m_view_speed * g_fov * delta_time * (int(dimensions.y / 2) - position.y);
             }
         }
-        glm::vec3 forward(
+        forward = glm::vec3(
             cos(context.m_vertical_angle) * sin(context.m_horizontal_angle),
             sin(context.m_vertical_angle),
             cos(context.m_vertical_angle) * cos(context.m_horizontal_angle));
@@ -103,5 +108,5 @@ namespace controls
         g_fov -= yoffset * 1.1;
         g_fov = std::clamp<float>(g_fov, 1.0, 300.0);
     }
-}
+    } // namespace controls
 }

@@ -52,7 +52,7 @@ namespace zsl
             ~controls();
         }controls;
 
-        glm::mat4 process_controls(controls& context, window::window& window_, float delta_time);
+        glm::mat4 process_controls(controls& context, window::window& window_, float delta_time, glm::vec3& forward);
 
         float get_fov();
 

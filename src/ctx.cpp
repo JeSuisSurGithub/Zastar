@@ -118,6 +118,7 @@ namespace zsl
         u32 frame_count = 0;
         std::string scroll_text = "/!\\ !!! TEST SCROLLING LONG MESSAGE !!! /!\\";
         glm::vec2 scroll_text_xy = {0, TEXT_SIZE * 4};
+        glm::vec3 forward{0.f};
 
         std::chrono::system_clock::time_point cur_time = std::chrono::high_resolution_clock::now();
         while (!should_close(ctx_.m_window))
@@ -128,7 +129,7 @@ namespace zsl
             cur_time = new_time;
 
             update(ctx_.m_window);
-            cur_ubo.view = process_controls(ctx_.m_controls, ctx_.m_window, delta_time);
+            cur_ubo.view = process_controls(ctx_.m_controls, ctx_.m_window, delta_time, forward);
 
             window::window_size dimensions = get_size(ctx_.m_window);
             cur_ubo.projection =
@@ -177,8 +178,8 @@ namespace zsl
             // Begin
             prepare_fb(*ctx_.m_framebuffer);
                 if (ctx_.m_controls.m_wireframe.toggled) { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); };
-                rendergroups::render(*ctx_.m_stargroup, cur_ubo.camera_xyz);
-                rendergroups::render(*ctx_.m_planetgroup, cur_ubo.camera_xyz);
+                rendergroups::render(*ctx_.m_stargroup, cur_ubo.camera_xyz, forward, controls::get_fov());
+                rendergroups::render(*ctx_.m_planetgroup, cur_ubo.camera_xyz, forward, controls::get_fov());
                 if (ctx_.m_controls.m_wireframe.toggled) { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); };
             // Render post processed scene
             render_w_fx(*ctx_.m_framebuffer, delta_time);

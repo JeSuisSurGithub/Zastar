@@ -65,13 +65,15 @@ namespace rendergroups
         }
     }
 
-    void render(planetgroup& context, glm::vec3 camera_xyz)
+    void render(planetgroup& context, glm::vec3 camera_xyz, const glm::vec3& forward, float fov)
     {
         bind(context.m_base.m_shader);
         ubo_planet cur_ubo;
         for (const planet& cur_object : context.m_planets)
         {
-            if (glm::distance(camera_xyz, cur_object.base.m_translation) > ZFAR) {
+            glm::vec3 direction = glm::normalize(cur_object.base.m_translation - camera_xyz);
+            float angle = glm::dot(forward, direction);
+            if (angle < (1.f - (fov / 180.f))) {
                 continue;
             }
 
