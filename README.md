@@ -1,5 +1,8 @@
 # Zastar
-A basic procedural world generator visualized with OpenGL 4.6
+A basic procedural space generator visualized with modern DSA OpenGL 4.6, compute shaders and SPIR-V
+
+### Dependencies
+OpenGL 4.6 with SPIR-V extension, GLM, GLFW3, stb_image, tiny_obj_loader
 
 ### TODO
 * Add particles ?
