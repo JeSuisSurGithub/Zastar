@@ -32,7 +32,7 @@ namespace zsl
         std::unique_ptr<rendergroups::textgroup> m_textgroup;
         std::unique_ptr<memory::ubo> m_ubo;
 
-        ctx(bool opengl_debug, u32 seed);
+        ctx(bool opengl_debug, u32 seed, usz size_count);
         ~ctx();
     }ctx;
 

@@ -52,7 +52,7 @@ namespace zsl
         std::cout << std::endl;
     }
 
-    ctx::ctx(bool opengl_debug, u32 seed)
+    ctx::ctx(bool opengl_debug, u32 seed, usz size_count)
     :
     m_window(),
     m_controls(m_window)
@@ -101,7 +101,7 @@ namespace zsl
         m_planetgroup = std::make_unique<rendergroups::planetgroup>();
         m_textgroup = std::make_unique<rendergroups::textgroup>(TEXT_SIZE);
 
-        gen::generate(*m_stargroup, *m_planetgroup, seed, 32);
+        gen::generate(*m_stargroup, *m_planetgroup, seed, size_count);
         ubo_shared shared;
         for (shared.point_light_count = 0; shared.point_light_count < m_stargroup->m_stars.size(); shared.point_light_count++) {
             shared.point_lights[shared.point_light_count]

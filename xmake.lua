@@ -1,7 +1,7 @@
 set_xmakever("2.2.1")
 
 set_project("Zastar")
-set_version("2.0.0")
+set_version("2.1.0")
 set_languages("cxx20")
 
 add_requires("opengl", "glfw", "glslang", {configs = {binaryonly = true}})
@@ -46,7 +46,8 @@ target("zastar")
     if is_mode("release") then
         add_cxxflags("-Ofast", "-march=native", "-flto", "-DNDEBUG")
     elseif is_mode("debug") then
-        add_cxxflags("-O0", "-ggdb")
+        add_links("asan")
+        add_cxxflags("-O0", "-ggdb", "-fsanitize=address")
     end
 
     -- Shaders

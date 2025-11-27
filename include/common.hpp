@@ -32,7 +32,7 @@ namespace zsl
 
     const std::string WINDOW_NAME{"Zastar"};
     constexpr u32 MAX_TEXTURE_COUNT{32};
-    constexpr u32 MAX_POINT_LIGHT{32};
+    constexpr u32 MAX_POINT_LIGHT{64};
     constexpr float ZFAR{4e+4};
     constexpr float ZNEAR{1.f};
 
@@ -93,14 +93,16 @@ namespace zsl
 
     typedef struct
     {
-        alignas(64) glm::mat4 view;
-        alignas(64) glm::mat4 projection;
-        alignas(16) glm::vec3 camera_xyz;
+        glm::mat4 view;
+        glm::mat4 projection;
+        glm::vec3 camera_xyz;
         ubo_point_light point_lights[MAX_POINT_LIGHT];
-        alignas(4) GLuint point_light_count;
+        GLuint point_light_count;
     }ubo_shared;
 
-    constexpr usz ubo_shared_size = 1684;
+    constexpr usz ubo_shared_size = sizeof(ubo_shared);
+
+    static_assert(alignof(ubo_shared) >= 16, "UBO must be 16-byte aligned");
 }
 
 #endif /* ZSLCOMMON_HPP */

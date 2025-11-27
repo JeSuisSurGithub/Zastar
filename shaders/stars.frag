@@ -7,7 +7,7 @@ layout(location = 3) in vec2 in_uv;
 layout(location = 0) out vec4 out_rgba;
 layout(location = 1) out vec4 out_rgba_bright;
 
-#define MAX_POINT_LIGHT 32
+#define MAX_POINT_LIGHT 64
 #define MAX_TEXTURE_COUNT 32
 
 layout (location = 0) uniform sampler2D textures[MAX_TEXTURE_COUNT];

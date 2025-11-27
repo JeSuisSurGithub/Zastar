@@ -8,7 +8,7 @@ layout (location = 1) out vec3 out_world_xyz;
 layout (location = 2) out vec3 out_world_normal;
 layout (location = 3) out vec2 out_uv;
 
-#define MAX_POINT_LIGHT 32
+#define MAX_POINT_LIGHT 64
 #define MAX_TEXTURE_COUNT 32
 
 struct point_light {

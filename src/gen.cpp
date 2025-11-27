@@ -57,7 +57,7 @@ namespace gen
             std::cout << "Generating star (" << (star_count + 1) << '/' << count << ")..." << std::endl;
             float star_scale = lehmer_randrange_flt(seed, 2.0, 200.0);
 
-            float max_star_pos_range = star_scale * SQUARE(count) * 0.1;
+            float max_star_pos_range = star_scale * SQUARE(count * 0.66) * 0.1;
 
             glm::vec3 star_position = {
                 lehmer_randrange_flt(seed, -max_star_pos_range, max_star_pos_range),
