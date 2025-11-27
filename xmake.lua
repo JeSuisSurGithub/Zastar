@@ -44,7 +44,7 @@ target("zastar")
     -- Compiler options
     set_warnings("everything")
     if is_mode("release") then
-        add_cxxflags("-Ofast", "-march=native", "-flto", "-DNDEBUG")
+        add_cxxflags("-Ofast", "-march=native", "-flto=auto", "-DNDEBUG")
     elseif is_mode("debug") then
         add_links("asan")
         add_cxxflags("-O0", "-ggdb", "-fsanitize=address")
