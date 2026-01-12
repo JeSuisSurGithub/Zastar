@@ -49,8 +49,6 @@ namespace zsl
         }model;
 
         void heightmap(std::vector<vertex>& vertices, std::shared_ptr<texture::texture> height_map);
-
-        void draw(model& model_);
     }
 }
 

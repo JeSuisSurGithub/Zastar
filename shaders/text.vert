@@ -1,4 +1,5 @@
 #version 460 core
+#extension GL_ARB_shader_draw_parameters : require
 
 layout (location = 0) in vec2 in_xy;
 layout (location = 1) in vec2 in_uv;
@@ -7,7 +8,7 @@ layout (location = 0) out vec2 out_uv;
 
 layout (location = 33) uniform vec2 resolution;
 
-layout (std140, binding = 0) buffer ssbo_text {
+layout (std430, binding = 0) buffer ssbo_text {
     vec2 translations[];
 };
 

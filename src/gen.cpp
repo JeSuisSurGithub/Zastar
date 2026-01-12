@@ -111,9 +111,9 @@ namespace gen
                     star_position.z + glm::sin(cur_angle) * distance_to_star};
 
                 rendergroups::material material_ = {
-                    .material_ambient  = lehmer_randrange_vec3(seed, glm::vec3(0.1, 0.1, 0.0), glm::vec3(0.4, 0.4, 0.6)),
-                    .material_diffuse  = glm::vec3(lehmer_randrange_flt(seed, 0.1, 0.4)),
-                    .material_specular = glm::vec3(lehmer_randrange_flt(seed, 1.0, 4.0)),
+                    .ambient  = lehmer_randrange_vec3(seed, glm::vec3(0.1, 0.1, 0.0), glm::vec3(0.4, 0.4, 0.6)),
+                    .diffuse  = glm::vec3(lehmer_randrange_flt(seed, 0.1, 0.4)),
+                    .specular = glm::vec3(lehmer_randrange_flt(seed, 1.0, 4.0)),
                     .shininess = lehmer_randrange_flt(seed, 2.0, 4.0)};
 
                 planets.m_planets.push_back(rendergroups::planet(
@@ -150,26 +150,12 @@ namespace gen
     m_gain_decay(decay),
     m_lacunarity(gain)
     {
-        glCreateBuffers(1, &m_vbo);
-        glNamedBufferStorage(m_vbo, sizeof(framebuffer::FULL_QUAD), &framebuffer::FULL_QUAD, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
-
-        glCreateVertexArrays(1, &m_vao);
-        glVertexArrayVertexBuffer(m_vao, 0, m_vbo, 0, (4 * sizeof(float)));
-        glEnableVertexArrayAttrib(m_vao, 0);
-        glEnableVertexArrayAttrib(m_vao, 1);
-        glVertexArrayAttribFormat(m_vao, 0, 2, GL_FLOAT, GL_FALSE, 0);
-        glVertexArrayAttribFormat(m_vao, 1, 2, GL_FLOAT, GL_FALSE, (2 * sizeof(float)));
-        glVertexArrayAttribBinding(m_vao, 0, 0);
-        glVertexArrayAttribBinding(m_vao, 1, 0);
-
-        glCreateFramebuffers(1, &m_fbo);
+        framebuffer::setup_quad_fb(m_vbo, m_vao, m_fbo);
     }
 
     noisegen::~noisegen()
     {
-        glDeleteVertexArrays(1, &m_vao);
-        glDeleteBuffers(1, &m_vbo);
-        glDeleteFramebuffers(1, &m_fbo);
+        framebuffer::destroy_quad_fb(m_vbo, m_vao, m_fbo);
     }
 
     std::shared_ptr<texture::texture> generate(noisegen& gen_)
@@ -196,9 +182,7 @@ namespace gen
         glBindFramebuffer(GL_FRAMEBUFFER, gen_.m_fbo);
         glViewport(0, 0, gen_.m_tex_size.x, gen_.m_tex_size.y);
 
-        glBindVertexArray(gen_.m_vao);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-        glBindVertexArray(0);
+        framebuffer::draw_quad_fb(gen_.m_vao);
 
         glMemoryBarrier(GL_FRAMEBUFFER_BARRIER_BIT);
 

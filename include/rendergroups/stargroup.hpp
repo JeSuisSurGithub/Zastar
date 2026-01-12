@@ -9,13 +9,14 @@ namespace zsl
 {
     namespace rendergroups
     {
-        typedef struct ubo_star
+        typedef struct star_instance
         {
-            alignas(64) glm::mat4 transform;
-            alignas(64) glm::mat4 inverse_transform;
-            alignas(4) float texture_offset;
-            alignas(4) GLuint texture_index;
-        }ubo_star;
+            glm::mat4 transform;
+            glm::mat4 inverse_transform;
+            float texture_offset;
+            GLuint texture_index;
+            float _pad0[2];
+        }star_instance;
 
         typedef struct star
         {
@@ -47,8 +48,6 @@ namespace zsl
             rendergroup m_base;
 
             std::vector<star> m_stars;
-
-            memory::ubo m_ubo;
 
             stargroup();
             ~stargroup();

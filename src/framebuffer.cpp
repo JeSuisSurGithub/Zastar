@@ -14,19 +14,7 @@ namespace framebuffer
     m_height(height),
     m_time(previous_count)
     {
-        glCreateBuffers(1, &m_vbo);
-        glNamedBufferStorage(m_vbo, sizeof(FULL_QUAD), &FULL_QUAD, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
-
-        glCreateVertexArrays(1, &m_vao);
-        glVertexArrayVertexBuffer(m_vao, 0, m_vbo, 0, (4 * sizeof(float)));
-        glEnableVertexArrayAttrib(m_vao, 0);
-        glEnableVertexArrayAttrib(m_vao, 1);
-        glVertexArrayAttribFormat(m_vao, 0, 2, GL_FLOAT, GL_FALSE, 0);
-        glVertexArrayAttribFormat(m_vao, 1, 2, GL_FLOAT, GL_FALSE, (2 * sizeof(float)));
-        glVertexArrayAttribBinding(m_vao, 0, 0);
-        glVertexArrayAttribBinding(m_vao, 1, 0);
-
-        glCreateFramebuffers(1, &m_fbo);
+        setup_quad_fb(m_vbo, m_vao, m_fbo);
         for (usz index = 0; index < 2; index++)
         {
             m_colorbufs[index] =
@@ -64,9 +52,7 @@ namespace framebuffer
 
     framebuffer::~framebuffer()
     {
-        glDeleteVertexArrays(1, &m_vao);
-        glDeleteBuffers(1, &m_vbo);
-        glDeleteFramebuffers(1, &m_fbo);
+        destroy_quad_fb(m_vbo, m_vao, m_fbo);
         glDeleteFramebuffers(1, &m_bloom_fbo);
     }
 
@@ -94,7 +80,7 @@ namespace framebuffer
             {
                 glViewport(0, 0, fb_.m_bloom_colorbufs[index]->m_width, fb_.m_bloom_colorbufs[index]->m_height);
                 bind_to_framebuffer(*fb_.m_bloom_colorbufs[index], fb_.m_bloom_fbo, GL_COLOR_ATTACHMENT0);
-                draw_quad(fb_);
+                draw_quad_fb(fb_.m_vao);
                 texture::bind(*fb_.m_bloom_colorbufs[index], 0);
             }
         }
@@ -106,7 +92,7 @@ namespace framebuffer
                 texture::bind(*fb_.m_bloom_colorbufs[index], 0);
                 glViewport(0, 0, fb_.m_bloom_colorbufs[index - 1]->m_width, fb_.m_bloom_colorbufs[index - 1]->m_height);
                 bind_to_framebuffer(*fb_.m_bloom_colorbufs[index - 1], fb_.m_bloom_fbo, GL_COLOR_ATTACHMENT0);
-                draw_quad(fb_);
+                draw_quad_fb(fb_.m_vao);
             }
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         }
@@ -118,14 +104,50 @@ namespace framebuffer
         texture::bind(*fb_.m_colorbufs[0], 0);
         texture::bind(*fb_.m_bloom_colorbufs[0], 1);
         texture::bind(fb_.m_depthbuf, 2);
-        draw_quad(fb_);
+        draw_quad_fb(fb_.m_vao);
     }
 
-    void draw_quad(framebuffer& fb_)
+    void draw_quad_fb(GLuint vao)
     {
-        glBindVertexArray(fb_.m_vao);
+        glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
+    }
+
+    void setup_quad_fb(GLuint& vbo, GLuint& vao, GLuint& fbo) {
+        glCreateBuffers(1, &vbo);
+        glNamedBufferStorage(vbo, sizeof(FULL_QUAD), &FULL_QUAD, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
+
+        glCreateVertexArrays(1, &vao);
+        glVertexArrayVertexBuffer(vao, 0, vbo, 0, (4 * sizeof(float)));
+        glEnableVertexArrayAttrib(vao, 0);
+        glEnableVertexArrayAttrib(vao, 1);
+        glVertexArrayAttribFormat(vao, 0, 2, GL_FLOAT, GL_FALSE, 0);
+        glVertexArrayAttribFormat(vao, 1, 2, GL_FLOAT, GL_FALSE, (2 * sizeof(float)));
+        glVertexArrayAttribBinding(vao, 0, 0);
+        glVertexArrayAttribBinding(vao, 1, 0);
+
+        glCreateFramebuffers(1, &fbo);
+    }
+
+    void destroy_quad_fb(GLuint vbo, GLuint vao, GLuint fbo)
+    {
+        glDeleteVertexArrays(1, &vao);
+        glDeleteBuffers(1, &vbo);
+        glDeleteFramebuffers(1, &fbo);
+    }
+
+    void update_viewport(glm::vec2 dimensions)
+    {
+        glViewport(0, 0, dimensions.x, dimensions.y);
+    }
+    void set_wireframe(bool set_unset)
+    {
+        if (set_unset) {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        } else {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
     }
 }
 }

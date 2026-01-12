@@ -3,6 +3,7 @@
 layout(location = 1) in vec3 in_world_xyz;
 layout(location = 2) in vec3 in_world_normal;
 layout(location = 3) in vec2 in_uv;
+layout(location = 4) flat in uint v_instance_id;
 
 layout(location = 0) out vec4 out_rgba;
 layout(location = 1) out vec4 out_rgba_bright;
@@ -28,14 +29,18 @@ layout (std140, binding = 0) uniform ubo_shared {
     uint current_point_light_count;
 };
 
-layout (std140, binding = 1) uniform ubo_planet {
+struct Planet {
     mat4 transform;
     mat4 inverse_transform;
-    uint texture_index;
-    vec3 material_ambient;
-    vec3 material_diffuse;
-    vec3 material_specular;
-    float shininess;
+    vec3 ambient; float _pad0;
+    vec3 diffuse; float _pad1;
+    vec3 specular; float _pad2;
+    float shininess;  float _pad3[3];
+    uint texture_index;float _pad4[3];
+};
+
+layout (std430, binding = 3) buffer ssbo_planet {
+    Planet planets[];
 };
 
 vec3 calc_point_light_combined(
@@ -50,14 +55,14 @@ vec3 calc_point_light_combined(
     float distance = length(position - frag_xyz);
     float attenuation = 1.0 / (range.x + range.y * distance + range.z * (distance * distance));
 
-    vec3 ambient = color * material_ambient * attenuation;
+    vec3 ambient = color * planets[v_instance_id].ambient * attenuation;
 
     float base_diffuse = max(dot(normal, light_direction), 0.0);
     vec3 halfway_direction = normalize(light_direction + view_direction);
-    float base_specular = pow(max(dot(normal, halfway_direction), 0.0), shininess);
+    float base_specular = pow(max(dot(normal, halfway_direction), 0.0), planets[v_instance_id].shininess);
     vec3 phong = ambient +
-            base_diffuse * color * material_diffuse * attenuation +
-            base_specular * color * material_specular * attenuation;
+            base_diffuse * color * planets[v_instance_id].diffuse * attenuation +
+            base_specular * color * planets[v_instance_id].specular * attenuation;
 
     float rim_factor = 1.0 - max(dot(normal, view_direction), 0.0);
     rim_factor = pow(rim_factor, RIM_POWER);
@@ -83,7 +88,7 @@ void main()
             view_direction);
     }
 
-    vec3 texture_color = vec3(0.5) - texture(textures[texture_index], in_uv).rgb;
+    vec3 texture_color = vec3(0.5) - texture(textures[planets[v_instance_id].texture_index], in_uv).rgb;
     vec4 hdr_color = vec4(lighting * texture_color, 1.0);
     out_rgba = hdr_color;
 

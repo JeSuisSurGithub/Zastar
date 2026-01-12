@@ -33,8 +33,7 @@ namespace rendergroups
     stargroup::stargroup()
     :
     m_base("shaders/stars.vert", "shaders/stars.frag"),
-    m_stars(),
-    m_ubo(UBO_BINDINGS::STAR, nullptr, sizeof(ubo_star))
+    m_stars()
     {
     }
 
@@ -50,7 +49,7 @@ namespace rendergroups
     void render(stargroup& context, glm::vec3 camera_xyz, const glm::vec3& forward, float fov)
     {
         bind(context.m_base.m_shader);
-        ubo_star cur_ubo;
+        std::vector<star_instance> stars;
         for (const star& cur_object : context.m_stars)
         {
             glm::vec3 direction = glm::normalize(cur_object.base.m_translation - camera_xyz);
@@ -61,13 +60,17 @@ namespace rendergroups
 
             int texture_index = cur_object.base.m_texture_index;
             bind(*context.m_base.m_textures[texture_index], texture_index);
-            cur_ubo.transform = get_transform_mat(cur_object.base);
-            cur_ubo.inverse_transform = glm::inverse(cur_ubo.transform);
-            cur_ubo.texture_index = texture_index;
-            cur_ubo.texture_offset = cur_object.texture_offset_count;
-            memory::update(context.m_ubo, &cur_ubo, sizeof(ubo_star), 0);
-            draw(*context.m_base.m_models[cur_object.base.m_model_index]);
+            star_instance inst;
+            inst.transform = get_transform_mat(cur_object.base);
+            inst.inverse_transform = glm::inverse(inst.transform);
+            inst.texture_index = texture_index;
+            inst.texture_offset = cur_object.texture_offset_count;
+            stars.push_back(std::move(inst));
         }
+        memory::ssbo ssbo_stars(SSBO_BINDINGS::STAR_DATA, stars.data(),stars.size() * sizeof(star_instance));
+        glBindVertexArray(context.m_base.m_models[context.m_stars[0].base.m_model_index]->m_vao);
+        glDrawElementsInstanced(GL_TRIANGLES, context.m_base.m_models[context.m_stars[0].base.m_model_index]->m_indices.size(), GL_UNSIGNED_INT, nullptr, context.m_stars.size());
+        glBindVertexArray(0);
     }
 
     glm::vec3 light_range_constants(float lightrange)

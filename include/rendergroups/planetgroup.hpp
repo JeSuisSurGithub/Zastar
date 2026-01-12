@@ -12,19 +12,20 @@ namespace zsl
     {
         typedef struct material
         {
-            alignas(16) glm::vec3 material_ambient;
-            alignas(16) glm::vec3 material_diffuse;
-            alignas(16) glm::vec3 material_specular;
-            float shininess;
+            glm::vec3 ambient; float _pad0;
+            glm::vec3 diffuse; float _pad1;
+            glm::vec3 specular; float _pad2;
+            float shininess; float _pad3[3];
         }material;
 
-        typedef struct ubo_planet
+        typedef struct planet_instance
         {
-            alignas(64) glm::mat4 transform;
-            alignas(64) glm::mat4 inverse_transform;
-            alignas(4) GLuint texture_index;
+            glm::mat4 transform;
+            glm::mat4 inverse_transform;
             material material_;
-        }ubo_planet;
+            GLuint texture_index;
+            float _pad0[3];
+        }planet_instance;
 
         typedef struct planet
         {
@@ -60,8 +61,6 @@ namespace zsl
             rendergroup m_base;
 
             std::vector<planet> m_planets;
-
-            memory::ubo m_ubo;
 
             planetgroup();
             ~planetgroup();

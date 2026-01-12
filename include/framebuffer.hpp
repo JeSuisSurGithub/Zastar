@@ -59,7 +59,12 @@ namespace zsl
 
         void prepare_fb(framebuffer& fb_);
         void render_w_fx(framebuffer& fb_, float delta_time);
-        void draw_quad(framebuffer& fb_);
+        void draw_quad_fb(GLuint vao);
+
+        void setup_quad_fb(GLuint& vbo, GLuint& vao, GLuint& fbo);
+        void destroy_quad_fb(GLuint vbo, GLuint vao, GLuint fbo);
+        void update_viewport(glm::vec2 dimensions);
+        void set_wireframe(bool set_unset);
     }
 }
 

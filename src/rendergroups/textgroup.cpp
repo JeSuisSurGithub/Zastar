@@ -74,14 +74,14 @@ namespace rendergroups
         for (const text& cur_text : texts)
         {
             for (usz count = 0; count < cur_text.text.size(); count++) {
-                group.m_translations.push_back(glm::vec4(group.m_size * count + cur_text.xy.x, cur_text.xy.y, 0, 0));
-                group.m_firsts.push_back(cur_text.text[count] * 6);
+                group.m_translations.push_back(glm::vec2(group.m_size * count + cur_text.xy.x, cur_text.xy.y));
+                group.m_firsts.push_back(static_cast<u8>(cur_text.text[count]) * 6);
                 group.m_counts.push_back(6);
             }
         }
 
         memory::ssbo ssbo_text(SSBO_BINDINGS::TEXT, group.m_translations.data(),
-            group.m_translations.size() * sizeof(glm::vec4));
+            group.m_translations.size() * sizeof(glm::vec2));
         glBindVertexArray(group.m_vao);
         glMultiDrawArrays(GL_TRIANGLES, group.m_firsts.data(), group.m_counts.data(), group.m_translations.size());
         glBindVertexArray(0);

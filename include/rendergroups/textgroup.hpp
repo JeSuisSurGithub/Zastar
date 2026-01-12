@@ -24,7 +24,7 @@ namespace zsl
 
             const usz m_size;
             std::vector<glm::vec4> m_vertices;
-            std::vector<glm::vec4> m_translations;
+            std::vector<glm::vec2> m_translations;
             std::vector<GLint> m_firsts;
             std::vector<GLsizei> m_counts;
 

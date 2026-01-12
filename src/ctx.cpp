@@ -107,7 +107,7 @@ namespace zsl
             shared.point_lights[shared.point_light_count]
                 = m_stargroup->m_stars[shared.point_light_count].point_light;
         }
-        m_ubo = std::make_unique<memory::ubo>(UBO_BINDINGS::SHARED, (void*)&shared, ubo_shared_size);
+        m_ubo = std::make_unique<memory::ubo>(UBO_BINDINGS::SHARED, (void*)&shared, sizeof(ubo_shared));
     }
 
     ctx::~ctx() {}
@@ -138,7 +138,7 @@ namespace zsl
 
             if (dimensions.x != ctx_.m_framebuffer->m_width || dimensions.y != ctx_.m_framebuffer->m_height)
             {
-                glViewport(0, 0, dimensions.x, dimensions.y);
+                framebuffer::update_viewport(dimensions);
                 u32 previous_count = ctx_.m_framebuffer->m_time;
                 ctx_.m_framebuffer = std::make_unique<framebuffer::framebuffer>(dimensions.x, dimensions.y, previous_count);
             }
@@ -177,10 +177,10 @@ namespace zsl
 
             // Begin
             prepare_fb(*ctx_.m_framebuffer);
-                if (ctx_.m_controls.m_wireframe.toggled) { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); };
+                if (ctx_.m_controls.m_wireframe.toggled) { framebuffer::set_wireframe(true); };
                 rendergroups::render(*ctx_.m_stargroup, cur_ubo.camera_xyz, forward, controls::get_fov());
                 rendergroups::render(*ctx_.m_planetgroup, cur_ubo.camera_xyz, forward, controls::get_fov());
-                if (ctx_.m_controls.m_wireframe.toggled) { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); };
+                if (ctx_.m_controls.m_wireframe.toggled) {  { framebuffer::set_wireframe(false); }; };
             // Render post processed scene
             render_w_fx(*ctx_.m_framebuffer, delta_time);
             // UI

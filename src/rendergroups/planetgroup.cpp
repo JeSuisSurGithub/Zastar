@@ -35,8 +35,7 @@ namespace rendergroups
     planetgroup::planetgroup()
     :
     m_base("shaders/planets.vert", "shaders/planets.frag"),
-    m_planets(),
-    m_ubo(UBO_BINDINGS::PLANET, nullptr, sizeof(ubo_planet))
+    m_planets()
     {
     }
 
@@ -68,7 +67,7 @@ namespace rendergroups
     void render(planetgroup& context, glm::vec3 camera_xyz, const glm::vec3& forward, float fov)
     {
         bind(context.m_base.m_shader);
-        ubo_planet cur_ubo;
+        std::vector<planet_instance> planets;
         for (const planet& cur_object : context.m_planets)
         {
             glm::vec3 direction = glm::normalize(cur_object.base.m_translation - camera_xyz);
@@ -80,13 +79,17 @@ namespace rendergroups
             int texture_index = cur_object.base.m_texture_index;
 
             bind(*context.m_base.m_textures[texture_index], texture_index);
-            cur_ubo.transform = get_transform_mat(cur_object.base);
-            cur_ubo.inverse_transform = glm::inverse(cur_ubo.transform);
-            cur_ubo.texture_index = texture_index;
-            cur_ubo.material_ = cur_object.material_;
-            memory::update(context.m_ubo, &cur_ubo, sizeof(ubo_planet), 0);
-            draw(*context.m_base.m_models[cur_object.base.m_model_index]);
+            planet_instance inst;
+            inst.transform = get_transform_mat(cur_object.base);
+            inst.inverse_transform = glm::inverse(inst.transform);
+            inst.texture_index = texture_index;
+            inst.material_ = cur_object.material_;
+            planets.push_back(std::move(inst));
         }
+        memory::ssbo ssbo_stars(SSBO_BINDINGS::PLANET_DATA, planets.data(),planets.size() * sizeof(planet_instance));
+        glBindVertexArray(context.m_base.m_models[context.m_planets[0].base.m_model_index]->m_vao);
+        glDrawElementsInstanced(GL_TRIANGLES, context.m_base.m_models[context.m_planets[0].base.m_model_index]->m_indices.size(), GL_UNSIGNED_INT, nullptr, context.m_planets.size());
+        glBindVertexArray(0);
     }
 }
 

@@ -110,15 +110,6 @@ namespace model
         glDeleteBuffers(1, &m_ebo);
     }
 
-    void draw(model& model_)
-    {
-        glBindVertexArray(model_.m_vao);
-        glDrawElements(GL_TRIANGLES, model_.m_indices.size(), GL_UNSIGNED_INT, nullptr);
-        glBindVertexArray(0);
-    }
-
-
-
     void heightmap(std::vector<vertex>& vertices, std::shared_ptr<texture::texture> height_map)
     {
         memory::ssbo ssbo_vertex{SSBO_BINDINGS::VERTEX, vertices.data(), vertices.size() * sizeof(vertex)};
