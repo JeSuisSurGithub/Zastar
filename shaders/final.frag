@@ -76,6 +76,34 @@ vec3 star_blur(sampler2D image, float frag_depth)
     return result / 4.0;
 }
 
+vec3 vhs_look(sampler2D image, vec2 uv, float chromatic_aberration_amount, float scan_shift, uint scan_height)
+{
+    const ivec2 resolution = textureSize(image, 0);
+    uint screen_tearing_pos = uint(time * 10e-2);
+    float shift = 0;
+    if (gl_FragCoord.y > screen_tearing_pos % resolution.y &&
+        gl_FragCoord.y < (screen_tearing_pos + (scan_height * 1/3)) % resolution.y)
+    {
+        shift = scan_shift * 1.4;
+    }
+    else if (gl_FragCoord.y >= (screen_tearing_pos + (scan_height * 1/3)) % resolution.y &&
+        gl_FragCoord.y < (screen_tearing_pos + (scan_height * 2/3)) % resolution.y)
+    {
+        shift = scan_shift * 1.2;
+    }
+    else if (gl_FragCoord.y > (screen_tearing_pos + (scan_height * 2/3)) % resolution.y &&
+        gl_FragCoord.y < (screen_tearing_pos + scan_height) % resolution.y)
+    {
+        shift = scan_shift;
+    }
+    return (vec3(
+        texture(image, uv - (vec2(chromatic_aberration_amount) / textureSize(image, 0)) - vec2(shift, 0)).r,
+        texture(image, uv - vec2(shift, 0)).g,
+        texture(image, uv + (vec2(chromatic_aberration_amount) / textureSize(image, 0)) - vec2(shift, 0)).b)
+    - (mod(gl_FragCoord.y, 2) * 0.20))
+    * max(abs(sin((gl_FragCoord.y + screen_tearing_pos) * 0.01)), 0.70);
+}
+
 vec3 tone_map(vec3 in_rgb)
 {
     vec3 tone_mapped = vec3(1.0) - exp(-in_rgb * EXPOSURE);
@@ -92,6 +120,12 @@ void main()
     vec3 base_color = mix(texture(plain, in_uv).rgb, texture(bloom, in_uv).rgb, BLOOM_MIX);
     vec3 blur_color = mix(star_blur(plain, frag_depth), star_blur(bloom, frag_depth), BLOOM_MIX);
     vec3 dof_color = mix(base_color, blur_color, depth_diff);
+
+    // vec3 hdr_color = vhs_look(plain, in_uv, 1.6, 0.008, 8);
+    // vec3 bloom_color = vhs_look(bloom, in_uv, 0.4, 0.008, 8);
+    // hdr_color = mix(hdr_color, bloom_color, 0.08);
+    // hdr_color = mix(hdr_color, dof_color, 0.1);
+
     vec3 tone_mapped = tone_map(dof_color);
 
     out_rgba = vec4(tone_mapped, texture(plain, in_uv).a);
