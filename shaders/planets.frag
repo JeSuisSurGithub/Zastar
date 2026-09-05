@@ -1,4 +1,7 @@
 #version 460 core
+#extension GL_ARB_shading_language_include : enable
+
+#include "common.glsl"
 
 layout(location = 1) in vec3 in_world_xyz;
 layout(location = 2) in vec3 in_world_normal;
@@ -8,18 +11,8 @@ layout(location = 4) flat in uint v_instance_id;
 layout(location = 0) out vec4 out_rgba;
 layout(location = 1) out vec4 out_rgba_bright;
 
-#define MAX_POINT_LIGHT 64
-#define MAX_TEXTURE_COUNT 32
 
 layout(location = 0) uniform sampler2D textures[MAX_TEXTURE_COUNT];
-
-const float RIM_POWER = 2.0;
-
-struct point_light {
-    vec3 position;
-    vec3 range;
-    vec3 color;
-};
 
 layout (std140, binding = 0) uniform ubo_shared {
     mat4 view;
@@ -27,16 +20,6 @@ layout (std140, binding = 0) uniform ubo_shared {
     vec3 camera_xyz;
     point_light point_lights[MAX_POINT_LIGHT];
     uint current_point_light_count;
-};
-
-struct Planet {
-    mat4 transform;
-    mat4 inverse_transform;
-    vec3 ambient; float _pad0;
-    vec3 diffuse; float _pad1;
-    vec3 specular; float _pad2;
-    float shininess;  float _pad3[3];
-    uint texture_index;float _pad4[3];
 };
 
 layout (std430, binding = 3) buffer ssbo_planet {
@@ -51,6 +34,15 @@ vec3 calc_point_light_combined(
     vec3 frag_xyz,
     vec3 view_direction)
 {
+    vec3 to_light = position - frag_xyz;
+    float distance_sq = dot(to_light, to_light);
+
+    // Hard cutoff.
+    const float MAX_LIGHT_DISTANCE = 1000.0;
+
+    if (distance_sq > MAX_LIGHT_DISTANCE * MAX_LIGHT_DISTANCE)
+        return vec3(0.0);
+
     vec3 light_direction = normalize(position - frag_xyz);
     float distance = length(position - frag_xyz);
     float attenuation = 1.0 / (range.x + range.y * distance + range.z * (distance * distance));

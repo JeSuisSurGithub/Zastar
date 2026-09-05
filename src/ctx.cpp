@@ -195,7 +195,7 @@ namespace zsl
                 delta_time =
                     std::chrono::duration<float, std::chrono::microseconds::period>(new_time - cur_time).count();
             }
-            while (delta_time < 16666);
+            while (delta_time < 0);
         }
     }
 }

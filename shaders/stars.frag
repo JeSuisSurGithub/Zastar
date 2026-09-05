@@ -1,5 +1,8 @@
 #version 460 core
 
+#extension GL_ARB_shading_language_include : enable
+#include "common.glsl"
+
 layout(location = 1) in vec3 in_world_xyz;
 layout(location = 2) in vec3 in_world_normal;
 layout(location = 3) in vec2 in_uv;
@@ -8,16 +11,7 @@ layout(location = 4) flat in uint v_instance_id;
 layout(location = 0) out vec4 out_rgba;
 layout(location = 1) out vec4 out_rgba_bright;
 
-#define MAX_POINT_LIGHT 64
-#define MAX_TEXTURE_COUNT 32
-
 layout (location = 0) uniform sampler2D textures[MAX_TEXTURE_COUNT];
-
-struct point_light {
-    vec3 position;
-    vec3 range;
-    vec3 color;
-};
 
 layout (std140, binding = 0) uniform ubo_shared {
     mat4 view;
@@ -25,13 +19,6 @@ layout (std140, binding = 0) uniform ubo_shared {
     vec3 camera_xyz;
     point_light point_lights[MAX_POINT_LIGHT];
     uint current_point_light_count;
-};
-
-struct Star {
-    mat4 transform;
-    mat4 inverse_transform;
-    float texture_offset;
-    uint texture_index; float _pad0[2];
 };
 
 layout (std430, binding = 2) buffer ssbo_star {

@@ -69,7 +69,7 @@ namespace rendergroups
         }
         memory::ssbo ssbo_stars(SSBO_BINDINGS::STAR_DATA, stars.data(),stars.size() * sizeof(star_instance));
         glBindVertexArray(context.m_base.m_models[context.m_stars[0].base.m_model_index]->m_vao);
-        glDrawElementsInstanced(GL_TRIANGLES, context.m_base.m_models[context.m_stars[0].base.m_model_index]->m_indices.size(), GL_UNSIGNED_INT, nullptr, context.m_stars.size());
+        glDrawElementsInstanced(GL_TRIANGLES, context.m_base.m_models[context.m_stars[0].base.m_model_index]->m_indices.size(), GL_UNSIGNED_INT, nullptr, stars.size());
         glBindVertexArray(0);
     }
 

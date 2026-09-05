@@ -88,7 +88,7 @@ namespace rendergroups
         }
         memory::ssbo ssbo_stars(SSBO_BINDINGS::PLANET_DATA, planets.data(),planets.size() * sizeof(planet_instance));
         glBindVertexArray(context.m_base.m_models[context.m_planets[0].base.m_model_index]->m_vao);
-        glDrawElementsInstanced(GL_TRIANGLES, context.m_base.m_models[context.m_planets[0].base.m_model_index]->m_indices.size(), GL_UNSIGNED_INT, nullptr, context.m_planets.size());
+        glDrawElementsInstanced(GL_TRIANGLES, context.m_base.m_models[context.m_planets[0].base.m_model_index]->m_indices.size(), GL_UNSIGNED_INT, nullptr, planets.size());
         glBindVertexArray(0);
     }
 }

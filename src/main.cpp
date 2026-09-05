@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-constexpr zsl::usz STAR_COUNT = 32;
+constexpr zsl::usz STAR_COUNT = 256;
 
 int main()
 {

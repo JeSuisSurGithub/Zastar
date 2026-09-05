@@ -32,7 +32,7 @@ namespace zsl
 
     const std::string WINDOW_NAME{"Zastar"};
     constexpr u32 MAX_TEXTURE_COUNT{32};
-    constexpr u32 MAX_POINT_LIGHT{64}; // Max start count
+    constexpr u32 MAX_POINT_LIGHT{256}; // Max start count
     constexpr float ZFAR{4e+4};
     constexpr float ZNEAR{1.f};
 
